@@ -11,8 +11,8 @@ import java.util.Scanner;
  */
 public class Main 
 {
-    public static int SURFACE_SIZE;
-    public static Boolean TEST = Boolean.FALSE;
+    private static int SURFACE_SIZE;
+    private static Boolean TEST = Boolean.FALSE;
     
     public static void main(String[] args) 
     {
@@ -25,7 +25,7 @@ public class Main
         
         try
         {
-            Main.SURFACE_SIZE = Integer.parseInt(args[1]); // czytanie z wejscia ilośći wierzchołków
+            Main.setSURFACE_SIZE(Integer.parseInt(args[1])); // czytanie z wejscia ilośći wierzchołków
         }
         catch(NumberFormatException e)
         {
@@ -55,11 +55,11 @@ public class Main
         }
         catch(NoSuchElementException ex)
         {
-            if(Main.TEST)
+            if(Main.getTEST())
                 System.err.println("BLAD ZLY FORMAT KRAWEDZI"+ex.getMessage());
         }
         
-        if(Main.TEST)
+        if(Main.getTEST())
         {
 //            System.out.println("Ilość Vertex'ów: "+(Main.GRAPH_SIZE-1));
 //            g.PrintList();
@@ -80,4 +80,36 @@ public class Main
 //        
 //        System.out.println("Skladowych spojnych : "+ilosc_skladowych_spojnych); 
     }    
+
+    /**
+     * @return the SURFACE_SIZE
+     */
+    public static int getSURFACE_SIZE()
+    {
+        return SURFACE_SIZE;
+    }
+
+    /**
+     * @param aSURFACE_SIZE the SURFACE_SIZE to set
+     */
+    public static void setSURFACE_SIZE(int aSURFACE_SIZE)
+    {
+        SURFACE_SIZE = aSURFACE_SIZE;
+    }
+
+    /**
+     * @return the TEST
+     */
+    public static Boolean getTEST()
+    {
+        return TEST;
+    }
+
+    /**
+     * @param aTEST the TEST to set
+     */
+    public static void setTEST(Boolean aTEST)
+    {
+        TEST = aTEST;
+    }
 }
