@@ -35,6 +35,8 @@ public class Main
         Tree tree = new Tree(); 
         Boolean didInsert;
         
+        tree.insert(Main.SURFACE_SIZE, Main.SURFACE_SIZE);
+        
         File file = new File(args[0]); // użycie pliku wejsciowego do odczytu danych
         try 
         {
