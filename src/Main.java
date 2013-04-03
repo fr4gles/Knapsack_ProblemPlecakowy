@@ -1,5 +1,8 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -32,10 +35,7 @@ public class Main
             System.err.println("BLAD ZLY ROZMIAR"+e.getMessage());
         }
         
-        Tree tree = new Tree(); 
-        Boolean didInsert;
-        
-        tree.insert(Main.SURFACE_SIZE, Main.SURFACE_SIZE);
+        List<Rectangle> rectList = new ArrayList<>();
         
         File file = new File(args[0]); // użycie pliku wejsciowego do odczytu danych
         try 
@@ -45,13 +45,8 @@ public class Main
             {
                 Integer w = sc.nextInt();
                 Integer h = sc.nextInt();
-                                
-                didInsert = tree.insert(w, h);
-                if (!didInsert)
-                {
-                    System.out.println("Undefined");
-                    break;
-                }
+                
+                rectList.add(new Rectangle(w, h));
             }
         } 
         catch (FileNotFoundException ex) 
@@ -61,8 +56,11 @@ public class Main
         catch(NoSuchElementException ex)
         {
             if(Main.getTEST())
-                System.err.println("BLAD ZLY FORMAT KRAWEDZI"+ex.getMessage());
+                System.err.println("BLAD ZLY FORMAT KRAWEDZI -> "+ex.getMessage());
         }
+        
+        Collections.sort(rectList,new RectComparator());
+        
         
         if(Main.getTEST())
         {
