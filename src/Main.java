@@ -84,13 +84,13 @@ public class Main
             
             k.go();
             
-//            if(Main.getTEST())
-//                System.out.println("Obecna ilosc odpadow = "+k.iloscOdpadow);
-            
-            if(k.iloscOdpadow == 0)
-                break;
+            if(Main.getTEST())
+                System.out.println("Obecna ilosc odpadow = "+k.iloscOdpadow);
             
             Main.BEST_VALUE = Math.min(Main.BEST_VALUE, k.iloscOdpadow);
+            
+            if(Main.BEST_VALUE == 0)
+                break;
         }
         
         if(Main.getTEST())

@@ -40,7 +40,7 @@ public class Knapsack
             
             iloscOdpadow = Main.getTOTAL_SURFACE_SIZE() - Main.getFILLED_AREA();
         }
-//        System.out.print("Ilosc uzytych klockow: "+iloscUzytychKlockow+"      ");
+        System.out.print("Ilosc uzytych klockow: "+iloscUzytychKlockow+"      ");
     }
     
     public void InitOrResetRootNode()
