@@ -24,17 +24,17 @@ public class Knapsack
         int iloscUzytychKlockow = 0;
         for(Rectangle i: rectList)
         {
-//            if( ( Main.getTOTAL_SURFACE_SIZE() - (Main.getFILLED_AREA() + i.GetWidth()*i.GetHeight()) ) < 0)
-//            {
-//                iloscOdpadow = Main.getTOTAL_SURFACE_SIZE() - Main.getFILLED_AREA();
-//                break;
-//            }
+            if( ( Main.getTOTAL_SURFACE_SIZE() - (Main.getFILLED_AREA() + i.GetWidth()*i.GetHeight()) ) < 0)
+            {
+                iloscOdpadow = Main.getTOTAL_SURFACE_SIZE() - Main.getFILLED_AREA();
+                break;
+            }
 
             Node tmp = rootNode.insert(i);
 
-            if(tmp!=null)
+            if(rootNode!=null)
             {
-                Main.setFILLED_AREA(Main.getFILLED_AREA() + tmp.rect.GetHeight()*tmp.rect.GetWidth());
+                Main.setFILLED_AREA(Main.getFILLED_AREA() + i.GetHeight()*i.GetWidth());
                 iloscUzytychKlockow++;
             }
             
@@ -45,6 +45,7 @@ public class Knapsack
     
     public void InitOrResetRootNode()
     {
+        iloscOdpadow = 0;
         rootNode = new Node();
         rootNode.rect = new Rectangle(Main.getSURFACE_SIZE(), Main.getSURFACE_SIZE());
     }
@@ -56,18 +57,6 @@ class Node
     public Node right;
     public Rectangle rect;
     public Boolean filled = Boolean.FALSE;
-    
-    public Boolean fitsIn(Rectangle rect)
-    {
-        return ( rect.GetWidth() >= this.rect.GetWidth() ) 
-                && (rect.GetHeight() >= this.rect.GetHeight());
-    }
-    
-    public Boolean isSameSize(Rectangle rect)
-    {
-        return (rect.GetWidth() == this.rect.GetWidth())
-                && (rect.GetHeight() == this.rect.GetHeight());
-    }
     
     public Node insert(Rectangle rect)
     {
@@ -85,10 +74,10 @@ class Node
         if(this.filled)
             return null;
         
-        if(!fitsIn(this.rect))
+        if(!rect.fitsIn(this.rect))
             return null;
         
-        if(isSameSize(this.rect))
+        if(rect.isSameSize(this.rect))
         {
             this.filled = Boolean.TRUE;
             return this;
@@ -111,8 +100,8 @@ class Node
         else
         {
             // split into top and bottom, putting rect on top.
-            this.left.rect = new Rectangle(me.GetX(), me.GetY(), me.GetWidth(), rect.GetHeight());
-            this.right.rect = new Rectangle(me.GetX(), me.GetY() + rect.GetHeight(), me.GetWidth(), me.GetHeight() - rect.GetHeight());
+            this.left.rect = new Rectangle(me.GetWidth(), rect.GetHeight(),me.GetX(), me.GetY());
+            this.right.rect = new Rectangle(me.GetWidth(), me.GetHeight() - rect.GetHeight(), me.GetX(), me.GetY() + rect.GetHeight());
         }
 
         return this.left.insert(rect);
@@ -135,6 +124,18 @@ class Rectangle
     public Rectangle(Integer w, Integer h, Integer x, Integer y)
     {
         Init(w, h, x, y);
+    }
+    
+    public Boolean fitsIn(Rectangle rect)
+    {
+        return ( rect.GetWidth() >= this.GetWidth() ) 
+                && (rect.GetHeight() >= this.GetHeight());
+    }
+    
+    public Boolean isSameSize(Rectangle rect)
+    {
+        return (rect.GetWidth() == this.GetWidth())
+                && (rect.GetHeight() == this.GetHeight());
     }
     
     private void Init(Integer w, Integer h, Integer x, Integer y)

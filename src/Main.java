@@ -66,7 +66,7 @@ public class Main
         
         Knapsack k = null;
         
-        long endTime = System.currentTimeMillis() + 1000;
+        long endTime = System.currentTimeMillis() + 100;
 
 //        System.out.println("Start: "+start);
 
