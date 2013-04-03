@@ -17,7 +17,8 @@ public class Main
     private static int SURFACE_SIZE;
     private static int TOTAL_SURFACE_SIZE;
     private static int FILLED_AREA;
-    private static Boolean TEST = Boolean.FALSE;
+    private static Boolean TEST = Boolean.TRUE;
+    private static int BEST_VALUE;
     
     public static void main(String[] args) 
     {
@@ -63,22 +64,56 @@ public class Main
                 System.err.println("BLAD ZLY FORMAT KRAWEDZI -> "+ex.getMessage());
         }
         
-        //Collections.sort(rectList,new RectComparator());
+        Knapsack k = null;
         
-        Collections.shuffle(rectList);
-        
-        Knapsack k = new Knapsack(rectList);
+        long endTime = System.currentTimeMillis() + 1000;
+
+//        System.out.println("Start: "+start);
+
+        int switcher = 1;
+        while(true)
+        {
+            if( System.currentTimeMillis() > endTime )
+                break;
+
+            Main.FILLED_AREA = 0;
+            
+            switchShuffleCollections(switcher++,rectList);
+            k = new Knapsack(rectList);
+            
+            k.go();
+            
+            if(Main.getTEST())
+                System.out.println("Obecna ilosc odpadow = "+k.iloscOdpadow);
+            
+            if(k.iloscOdpadow == 0)
+                break;
+        }
+
+        BEST_VALUE = k.iloscOdpadow;
         
         if(Main.getTEST())
         {
-//            System.out.println("Ilość Vertex'ów: "+(Main.GRAPH_SIZE-1));
-//            g.PrintList();
+            System.out.println("Ilosc prob: "+ (switcher-1) );
         }
         
         System.out.println("Ilosc odpadow = " + k.iloscOdpadow );
         
     }    
 
+    public static void/*List<Rectangle>*/ switchShuffleCollections(int i, List<Rectangle> rectList)
+    {
+        switch(i)
+        {
+            case 1:     Collections.sort(rectList,new AscRectComparator());
+                break;
+            case 2:     Collections.sort(rectList,new DescRectComparator());
+                break;
+            default:    Collections.shuffle(rectList);
+                break;        
+        }
+    }
+    
     /**
      * @return the SURFACE_SIZE
      */

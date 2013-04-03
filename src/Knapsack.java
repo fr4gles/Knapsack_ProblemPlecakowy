@@ -9,31 +9,41 @@ public class Knapsack
 {
     public Node rootNode;
     public Integer iloscOdpadow;
+    public List<Rectangle> rectList;
     
     public Knapsack(List<Rectangle> rectList)
     {
         iloscOdpadow = 0;
+        this.rectList = rectList;
+    }
+    
+    public void go() 
+    {        
+        InitOrResetRootNode();
         
-        InitRootNode();
-        
+        int iloscUzytychKlockow = 0;
         for(Rectangle i: rectList)
         {
-            if( ( Main.getTOTAL_SURFACE_SIZE() - (Main.getFILLED_AREA() + i.GetWidth()*i.GetHeight()) ) < 0)
-                break;
-            
-            rootNode.insert(i);
-            
-            if(rootNode!=null)
+//            if( ( Main.getTOTAL_SURFACE_SIZE() - (Main.getFILLED_AREA() + i.GetWidth()*i.GetHeight()) ) < 0)
+//            {
+//                iloscOdpadow = Main.getTOTAL_SURFACE_SIZE() - Main.getFILLED_AREA();
+//                break;
+//            }
+
+            Node tmp = rootNode.insert(i);
+
+            if(tmp!=null)
             {
-                Main.setFILLED_AREA(Main.getFILLED_AREA() + i.GetHeight()*i.GetWidth());                
+                Main.setFILLED_AREA(Main.getFILLED_AREA() + tmp.rect.GetHeight()*tmp.rect.GetWidth());
+                iloscUzytychKlockow++;
             }
             
             iloscOdpadow = Main.getTOTAL_SURFACE_SIZE() - Main.getFILLED_AREA();
         }
-        
+        System.out.print("Ilosc uzytych klockow: "+iloscUzytychKlockow+"      ");
     }
     
-    public void InitRootNode()
+    public void InitOrResetRootNode()
     {
         rootNode = new Node();
         rootNode.rect = new Rectangle(Main.getSURFACE_SIZE(), Main.getSURFACE_SIZE());
@@ -50,13 +60,13 @@ class Node
     public Boolean fitsIn(Rectangle rect)
     {
         return ( rect.GetWidth() >= this.rect.GetWidth() ) 
-                && rect.GetHeight() >= this.rect.GetHeight();
+                && (rect.GetHeight() >= this.rect.GetHeight());
     }
     
     public Boolean isSameSize(Rectangle rect)
     {
-        return rect.GetWidth() == this.rect.GetWidth() 
-                && rect.GetHeight() == this.rect.GetHeight();
+        return (rect.GetWidth() == this.rect.GetWidth())
+                && (rect.GetHeight() == this.rect.GetHeight());
     }
     
     public Node insert(Rectangle rect)
@@ -174,10 +184,18 @@ class Rectangle
     }
 }
 
-class RectComparator implements Comparator<Rectangle> 
+class AscRectComparator implements Comparator<Rectangle> 
 {
     public int compare(Rectangle rect1, Rectangle rect2) 
     {
         return rect1.Area().compareTo(rect2.Area());
+    }
+}
+
+class DescRectComparator implements Comparator<Rectangle> 
+{
+    public int compare(Rectangle rect1, Rectangle rect2) 
+    {
+        return rect2.Area().compareTo(rect1.Area());
     }
 }
