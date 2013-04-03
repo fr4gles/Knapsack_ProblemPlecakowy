@@ -1,4 +1,5 @@
 import java.util.Comparator;
+import java.util.List;
 
 /**
  *
@@ -6,7 +7,23 @@ import java.util.Comparator;
  */
 public class Knapsack 
 {
+    public Node rootNode;
     
+    public Knapsack(List<Rectangle> rectList)
+    {
+        rootNode = new Node();
+        rootNode.rectangle = new Rectangle(Main.getSURFACE_SIZE(), Main.getSURFACE_SIZE());
+        
+        for(Rectangle i: rectList)
+        {
+            rootNode.insert(i);
+            
+            if(rootNode!=null)
+            {
+                Main.setFILLED_AREA(rootNode.rectangle.GetHeight()*rootNode.rectangle.GetWidth());                
+            }
+        }
+    }
 }
 
 class Node
@@ -14,7 +31,7 @@ class Node
     public Node left;
     public Node right;
     public Rectangle rectangle;
-    public Boolean filled;
+    public Boolean filled = Boolean.FALSE;
     
     public Boolean fitsIn(Rectangle rect)
     {
@@ -41,7 +58,7 @@ class Node
             return tmpNode;
         }
         
-        if(filled)
+        if(this.filled)
             return null;
         
         if(!fitsIn(rectangle))

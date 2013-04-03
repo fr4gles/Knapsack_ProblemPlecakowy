@@ -15,6 +15,7 @@ import java.util.Scanner;
 public class Main 
 {
     private static int SURFACE_SIZE;
+    private static int FILLED_AREA;
     private static Boolean TEST = Boolean.FALSE;
     
     public static void main(String[] args) 
@@ -29,6 +30,7 @@ public class Main
         try
         {
             Main.setSURFACE_SIZE(Integer.parseInt(args[1])); // czytanie z wejscia ilośći wierzchołków
+            Main.setFILLED_AREA(0);
         }
         catch(NumberFormatException e)
         {
@@ -61,12 +63,17 @@ public class Main
         
         Collections.sort(rectList,new RectComparator());
         
+        Knapsack k = new Knapsack(rectList);
         
         if(Main.getTEST())
         {
 //            System.out.println("Ilość Vertex'ów: "+(Main.GRAPH_SIZE-1));
 //            g.PrintList();
         }
+        
+        System.out.println("Ilosc odpadow = " + ( (Main.getSURFACE_SIZE()*Main.getSURFACE_SIZE()) 
+                                                    - Main.getFILLED_AREA()) );
+        
     }    
 
     /**
@@ -91,5 +98,21 @@ public class Main
     public static Boolean getTEST()
     {
         return TEST;
+    }
+
+    /**
+     * @return the FILLED_AREA
+     */
+    public static int getFILLED_AREA()
+    {
+        return FILLED_AREA;
+    }
+
+    /**
+     * @param aFILLED_AREA the FILLED_AREA to set
+     */
+    public static void setFILLED_AREA(int aFILLED_AREA)
+    {
+        FILLED_AREA = aFILLED_AREA;
     }
 }
