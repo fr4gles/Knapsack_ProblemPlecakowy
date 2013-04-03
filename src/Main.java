@@ -15,6 +15,7 @@ import java.util.Scanner;
 public class Main 
 {
     private static int SURFACE_SIZE;
+    private static int TOTAL_SURFACE_SIZE;
     private static int FILLED_AREA;
     private static Boolean TEST = Boolean.FALSE;
     
@@ -31,6 +32,7 @@ public class Main
         {
             Main.setSURFACE_SIZE(Integer.parseInt(args[1])); // czytanie z wejscia ilośći wierzchołków
             Main.setFILLED_AREA(0);
+            Main.setTOTAL_SURFACE_SIZE(Main.getSURFACE_SIZE()*Main.getSURFACE_SIZE());
         }
         catch(NumberFormatException e)
         {
@@ -61,7 +63,9 @@ public class Main
                 System.err.println("BLAD ZLY FORMAT KRAWEDZI -> "+ex.getMessage());
         }
         
-        Collections.sort(rectList,new RectComparator());
+        //Collections.sort(rectList,new RectComparator());
+        
+        Collections.shuffle(rectList);
         
         Knapsack k = new Knapsack(rectList);
         
@@ -71,8 +75,7 @@ public class Main
 //            g.PrintList();
         }
         
-        System.out.println("Ilosc odpadow = " + ( (Main.getSURFACE_SIZE()*Main.getSURFACE_SIZE()) 
-                                                    - Main.getFILLED_AREA()) );
+        System.out.println("Ilosc odpadow = " + k.iloscOdpadow );
         
     }    
 
@@ -114,5 +117,21 @@ public class Main
     public static void setFILLED_AREA(int aFILLED_AREA)
     {
         FILLED_AREA = aFILLED_AREA;
+    }
+
+    /**
+     * @return the TOTAL_SURFACE_SIZE
+     */
+    public static int getTOTAL_SURFACE_SIZE()
+    {
+        return TOTAL_SURFACE_SIZE;
+    }
+
+    /**
+     * @param aTOTAL_SURFACE_SIZE the TOTAL_SURFACE_SIZE to set
+     */
+    public static void setTOTAL_SURFACE_SIZE(int aTOTAL_SURFACE_SIZE)
+    {
+        TOTAL_SURFACE_SIZE = aTOTAL_SURFACE_SIZE;
     }
 }

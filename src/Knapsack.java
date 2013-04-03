@@ -8,21 +8,35 @@ import java.util.List;
 public class Knapsack 
 {
     public Node rootNode;
+    public Integer iloscOdpadow;
     
     public Knapsack(List<Rectangle> rectList)
     {
-        rootNode = new Node();
-        rootNode.rectangle = new Rectangle(Main.getSURFACE_SIZE(), Main.getSURFACE_SIZE());
+        iloscOdpadow = 0;
+        
+        InitRootNode();
         
         for(Rectangle i: rectList)
         {
+            if( ( Main.getTOTAL_SURFACE_SIZE() - (Main.getFILLED_AREA() + i.GetWidth()*i.GetHeight()) ) < 0)
+                break;
+            
             rootNode.insert(i);
             
             if(rootNode!=null)
             {
-                Main.setFILLED_AREA(rootNode.rectangle.GetHeight()*rootNode.rectangle.GetWidth());                
+                Main.setFILLED_AREA(Main.getFILLED_AREA() + i.GetHeight()*i.GetWidth());                
             }
+            
+            iloscOdpadow = Main.getTOTAL_SURFACE_SIZE() - Main.getFILLED_AREA();
         }
+        
+    }
+    
+    public void InitRootNode()
+    {
+        rootNode = new Node();
+        rootNode.rect = new Rectangle(Main.getSURFACE_SIZE(), Main.getSURFACE_SIZE());
     }
 }
 
@@ -30,19 +44,19 @@ class Node
 {
     public Node left;
     public Node right;
-    public Rectangle rectangle;
+    public Rectangle rect;
     public Boolean filled = Boolean.FALSE;
     
     public Boolean fitsIn(Rectangle rect)
     {
-        return rect.GetWidth() >= rectangle.GetWidth() 
-                && rect.GetHeight() >= rectangle.GetHeight();
+        return ( rect.GetWidth() >= this.rect.GetWidth() ) 
+                && rect.GetHeight() >= this.rect.GetHeight();
     }
     
     public Boolean isSameSize(Rectangle rect)
     {
-        return rect.GetWidth() == rectangle.GetWidth() 
-                && rect.GetHeight() == rectangle.GetHeight();
+        return rect.GetWidth() == this.rect.GetWidth() 
+                && rect.GetHeight() == this.rect.GetHeight();
     }
     
     public Node insert(Rectangle rect)
@@ -61,10 +75,10 @@ class Node
         if(this.filled)
             return null;
         
-        if(!fitsIn(rectangle))
+        if(!fitsIn(this.rect))
             return null;
         
-        if(isSameSize(rectangle))
+        if(isSameSize(this.rect))
         {
             this.filled = Boolean.TRUE;
             return this;
@@ -73,22 +87,22 @@ class Node
         this.left = new Node();
         this.right = new Node();
         
-        Integer width_diff = this.rectangle.GetWidth() - rect.GetWidth();
-        Integer height_diff = this.rectangle.GetHeight() - rect.GetHeight();
+        Integer width_diff = this.rect.GetWidth() - rect.GetWidth();
+        Integer height_diff = this.rect.GetHeight() - rect.GetHeight();
         
-        Rectangle me = this.rectangle;
+        Rectangle me = this.rect;
         
         if(width_diff > height_diff)
         {
             // split literally into left and right, putting the rect on the left.
-            this.left.rectangle = new Rectangle(me.GetX(), me.GetY(), rect.GetWidth(), me.GetHeight());
-            this.right.rectangle = new Rectangle(me.GetX() + rect.GetWidth(), me.GetY(), me.GetWidth() - rect.GetWidth(), me.GetHeight());
+            this.left.rect = new Rectangle(me.GetX(), me.GetY(), rect.GetWidth(), me.GetHeight());
+            this.right.rect = new Rectangle(me.GetX() + rect.GetWidth(), me.GetY(), me.GetWidth() - rect.GetWidth(), me.GetHeight());
         }
         else
         {
             // split into top and bottom, putting rect on top.
-            this.left.rectangle = new Rectangle(me.GetX(), me.GetY(), me.GetWidth(), rect.GetHeight());
-            this.right.rectangle = new Rectangle(me.GetX(), me.GetY() + rect.GetHeight(), me.GetWidth(), me.GetHeight() - rect.GetHeight());
+            this.left.rect = new Rectangle(me.GetX(), me.GetY(), me.GetWidth(), rect.GetHeight());
+            this.right.rect = new Rectangle(me.GetX(), me.GetY() + rect.GetHeight(), me.GetWidth(), me.GetHeight() - rect.GetHeight());
         }
 
         return this.left.insert(rect);
@@ -164,6 +178,6 @@ class RectComparator implements Comparator<Rectangle>
 {
     public int compare(Rectangle rect1, Rectangle rect2) 
     {
-        return rect2.Area().compareTo(rect1.Area());
+        return rect1.Area().compareTo(rect2.Area());
     }
 }
