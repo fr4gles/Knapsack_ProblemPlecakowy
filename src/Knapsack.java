@@ -32,7 +32,7 @@ public class Knapsack
 
             Node tmp = rootNode.insert(i);
 
-            if(rootNode!=null)
+            if(tmp!=null)
             {
                 Main.setFILLED_AREA(Main.getFILLED_AREA() + i.GetHeight()*i.GetWidth());
                 iloscUzytychKlockow++;
@@ -40,7 +40,7 @@ public class Knapsack
             
             iloscOdpadow = Main.getTOTAL_SURFACE_SIZE() - Main.getFILLED_AREA();
         }
-        System.out.print("Ilosc uzytych klockow: "+iloscUzytychKlockow+"      ");
+//        System.out.print("Ilosc uzytych klockow: "+iloscUzytychKlockow+"      ");
     }
     
     public void InitOrResetRootNode()
@@ -94,8 +94,8 @@ class Node
         if(width_diff > height_diff)
         {
             // split literally into left and right, putting the rect on the left.
-            this.left.rect = new Rectangle(me.GetX(), me.GetY(), rect.GetWidth(), me.GetHeight());
-            this.right.rect = new Rectangle(me.GetX() + rect.GetWidth(), me.GetY(), me.GetWidth() - rect.GetWidth(), me.GetHeight());
+            this.left.rect = new Rectangle(rect.GetWidth(), me.GetHeight(),me.GetX(), me.GetY());
+            this.right.rect = new Rectangle(me.GetWidth() - rect.GetWidth(), me.GetHeight(),me.GetX() + rect.GetWidth(), me.GetY());
         }
         else
         {

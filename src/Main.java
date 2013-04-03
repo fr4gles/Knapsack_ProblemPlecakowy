@@ -66,11 +66,12 @@ public class Main
         
         Knapsack k = null;
         
-        long endTime = System.currentTimeMillis() + 100;
+        long endTime = System.currentTimeMillis() + 60000;
 
 //        System.out.println("Start: "+start);
 
         int switcher = 1;
+        Main.BEST_VALUE = Main.TOTAL_SURFACE_SIZE;
         while(true)
         {
             if( System.currentTimeMillis() > endTime )
@@ -83,21 +84,21 @@ public class Main
             
             k.go();
             
-            if(Main.getTEST())
-                System.out.println("Obecna ilosc odpadow = "+k.iloscOdpadow);
+//            if(Main.getTEST())
+//                System.out.println("Obecna ilosc odpadow = "+k.iloscOdpadow);
             
             if(k.iloscOdpadow == 0)
                 break;
+            
+            Main.BEST_VALUE = Math.min(Main.BEST_VALUE, k.iloscOdpadow);
         }
-
-        BEST_VALUE = k.iloscOdpadow;
         
         if(Main.getTEST())
         {
             System.out.println("Ilosc prob: "+ (switcher-1) );
         }
         
-        System.out.println("Ilosc odpadow = " + k.iloscOdpadow );
+        System.out.println("Ilosc odpadow = " + Main.BEST_VALUE );
         
     }    
 
