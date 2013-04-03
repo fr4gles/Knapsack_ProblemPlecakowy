@@ -22,7 +22,7 @@ public class Main
             System.err.println("W pliku powinny znajdowac sie pary liczb calkowitych (w oraz h)");
             System.exit(1);
         }
-        
+                
         try
         {
             Main.setSURFACE_SIZE(Integer.parseInt(args[1])); // czytanie z wejscia ilośći wierzchołków
@@ -32,8 +32,8 @@ public class Main
             System.err.println("BLAD ZLY ROZMIAR"+e.getMessage());
         }
         
-//        Graph g = new Graph(); // nowy obiekt grafu
-        
+        Tree tree = new Tree(); 
+        Boolean didInsert;
         
         File file = new File(args[0]); // użycie pliku wejsciowego do odczytu danych
         try 
@@ -44,9 +44,12 @@ public class Main
                 Integer w = sc.nextInt();
                 Integer h = sc.nextInt();
                                 
-                // program liczy ilosc słabych! składowych spójnych
-//                g.addEdge(new Edge(new Vertex(a), new Vertex(b)));  // dodanie krawędzi między wierzchołkami
-//                g.addEdge(new Edge(new Vertex(b), new Vertex(a)));  
+                didInsert = tree.insert(w, h);
+                if (!didInsert)
+                {
+                    System.out.println("Undefined");
+                    break;
+                }
             }
         } 
         catch (FileNotFoundException ex) 
@@ -64,21 +67,6 @@ public class Main
 //            System.out.println("Ilość Vertex'ów: "+(Main.GRAPH_SIZE-1));
 //            g.PrintList();
         }
-        
-//        int ilosc_skladowych_spojnych = 0;
-//        for(int i=1;i<Main.GRAPH_SIZE;++i)      // dla każdego wierzchołka... zaczynając od 1 (wierzchołek 0 jest ignorowany -> aby utrzymać zgodność z wymaganiami)
-//        {
-//            if(!g.GetDiscoveredList().get(i))   //jeśli wierzchołek nie został odwiedzony to ...
-//            {
-//                g.DFS(i);                       // rozpocznij procedurę DFS
-//                ilosc_skladowych_spojnych++;    // zwiększ ilość składowych spójnych
-//                
-//                if(Main.TEST)
-//                    System.out.println("");
-//            }
-//        }                                       // koniec ;)
-//        
-//        System.out.println("Skladowych spojnych : "+ilosc_skladowych_spojnych); 
     }    
 
     /**
@@ -103,13 +91,5 @@ public class Main
     public static Boolean getTEST()
     {
         return TEST;
-    }
-
-    /**
-     * @param aTEST the TEST to set
-     */
-    public static void setTEST(Boolean aTEST)
-    {
-        TEST = aTEST;
     }
 }
