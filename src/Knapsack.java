@@ -192,11 +192,15 @@ class Rectangle
     }
 }
 
-
+enum Order 
+{
+    Area, 
+    Width, 
+    Height
+}
 
 abstract class RectComparator implements Comparator<Rectangle> 
 {
-    public enum Order {Area, Width, Height}
     protected Order sortingBy = Order.Area;
 
     public RectComparator()

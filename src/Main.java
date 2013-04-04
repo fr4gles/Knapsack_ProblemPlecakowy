@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+    
 /**
  * Główna klasa programu
  * Odpowiada za wykorzystanie logiki zawartej w Klasie Graph do znalezienia slabych skladowych spojnych
@@ -141,6 +142,31 @@ public class Main
         return rectList;
     }
     
+            private static int i = 0;
+
+    /**
+     * @return the i
+     */
+    public static int getI()
+    {
+        return i;
+    }
+
+    /**
+     * @param aI the i to set
+     */
+    public static void setI(int aI)
+    {
+        i = aI;
+    }
+    
+    private static Order wybierzTrybSortowania()
+    {
+
+        Order o = Order.Area;
+        
+        return o;
+    }
     private static List<Rectangle> rectListSorter(List<Rectangle> rectList, int caseNum)
     {
         int tmpSize = rectList.size();
