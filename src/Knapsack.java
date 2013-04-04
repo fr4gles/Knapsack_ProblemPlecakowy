@@ -17,13 +17,13 @@ public class Knapsack
         this.rectList = rectList;
     }
     
-    public void go() 
+    public int pack() 
     {        
         InitOrResetRootNode();
         
         int iloscUzytychKlockow = 0;
         for(Rectangle i: rectList)
-        {
+        {            
             if( ( Main.getTOTAL_SURFACE_SIZE() - (Main.getFILLED_AREA() + i.GetWidth()*i.GetHeight()) ) < 0)
             {
                 iloscOdpadow = Main.getTOTAL_SURFACE_SIZE() - Main.getFILLED_AREA();
@@ -42,7 +42,9 @@ public class Knapsack
         }
         
         if(Main.getTEST())
-            System.out.print("Ilosc uzytych klockow: "+iloscUzytychKlockow+"      "+"Obecna ilosc odpadow = "+iloscOdpadow);
+            System.out.println("Ilosc uzytych klockow: "+iloscUzytychKlockow+"      "+"Obecna ilosc odpadow = "+iloscOdpadow);
+        
+        return iloscOdpadow;
     }
     
     public void InitOrResetRootNode()
@@ -62,6 +64,9 @@ class Node
     
     public Node insert(Rectangle rect)
     {
+        if(System.currentTimeMillis() > Main.getDEADLINE())
+            return null;
+        
         if(this.left != null)
         {
             Node tmpNode = this.left.insert(rect);
@@ -187,18 +192,66 @@ class Rectangle
     }
 }
 
-class AscRectComparator implements Comparator<Rectangle> 
+
+
+abstract class RectComparator implements Comparator<Rectangle> 
 {
+    public enum Order {Area, Width, Height}
+    protected Order sortingBy = Order.Area;
+
+    public RectComparator()
+    {
+        this.sortingBy = Order.Area;
+    }
+    
+    
+    
+    @Override
+    abstract public int compare(Rectangle rect1, Rectangle rect2);
+}
+class AscRectComparator extends RectComparator
+{
+    public AscRectComparator()
+    {
+        super();
+    }
+    
+    public AscRectComparator(Order sortBy)
+    {
+        this.sortingBy = sortBy;
+    }
     public int compare(Rectangle rect1, Rectangle rect2) 
     {
-        return rect1.Area().compareTo(rect2.Area());
+        switch(sortingBy)
+        {
+            case Area:      return rect1.Area().compareTo(rect2.Area());
+            case Width:     return rect1.GetWidth().compareTo(rect2.GetWidth());
+            case Height:    return rect1.GetHeight().compareTo(rect2.GetHeight());
+        }
+        throw new RuntimeException("Practically unreachable code, can't be thrown");
     }
 }
 
-class DescRectComparator implements Comparator<Rectangle> 
+class DescRectComparator extends RectComparator
 {
+    public DescRectComparator()
+    {
+        super();
+    }
+    
+    public DescRectComparator(Order sortBy)
+    {
+        this.sortingBy = sortBy;
+    }
+
     public int compare(Rectangle rect1, Rectangle rect2) 
     {
-        return rect2.Area().compareTo(rect1.Area());
+        switch(sortingBy)
+        {
+            case Area:      return rect2.Area().compareTo(rect1.Area());
+            case Width:     return rect2.GetWidth().compareTo(rect1.GetWidth());
+            case Height:    return rect2.GetHeight().compareTo(rect1.GetHeight());
+        }
+        throw new RuntimeException("Practically unreachable code, can't be thrown");
     }
 }

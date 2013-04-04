@@ -17,16 +17,17 @@ public class Main
     private static int SURFACE_SIZE;
     private static int TOTAL_SURFACE_SIZE;
     private static int FILLED_AREA;
-    private static Boolean TEST = Boolean.FALSE;
+    private static Boolean TEST = Boolean.TRUE;
     private static int BEST_VALUE;
+    private static long DEADLINE;
     
     public static void main(String[] args) 
     {
         long startTime = 0;
+        setDEADLINE(System.currentTimeMillis() + 225000); // (3.75*60000) -> deadline wykonania zadania
+        
         if(Main.getTEST())
-        {
             startTime = System.currentTimeMillis();
-        }
         
         if(args.length < 2) // jesli zla ilosc argumentow wejsciowych to poinforuj o tym uzytkownika
         {
@@ -46,7 +47,7 @@ public class Main
             System.err.println("BLAD ZLY ROZMIAR"+e.getMessage());
         }
         
-        List<Rectangle> rectList = new ArrayList<>();
+        List<Rectangle> rectListOrigin = new ArrayList<>();
         
         File file = new File(args[0]); // użycie pliku wejsciowego do odczytu danych
         try 
@@ -57,7 +58,7 @@ public class Main
                 Integer w = sc.nextInt();
                 Integer h = sc.nextInt();
                 
-                rectList.add(new Rectangle(w, h));
+                rectListOrigin.add(new Rectangle(w, h));
             }
         } 
         catch (FileNotFoundException ex) 
@@ -72,25 +73,24 @@ public class Main
         
         Knapsack k = null;
         
-        long endTime = System.currentTimeMillis() + 60000;
+        long endTime = System.currentTimeMillis() + 180000; // (3*60000)
 
-//        System.out.println("Start: "+start);
-
-        int switcher = 1;
-        Main.BEST_VALUE = Main.TOTAL_SURFACE_SIZE;
+        int switchSortStrategy = 0;
+        int localBest_iloscOdpadow = 0;
+        Main.BEST_VALUE = Main.getTOTAL_SURFACE_SIZE();
         while(true)
         {
-            if( System.currentTimeMillis() > endTime )
+            if( System.currentTimeMillis() > endTime || System.currentTimeMillis() > Main.getDEADLINE())
                 break;
 
-            Main.FILLED_AREA = 0;
+            Main.setFILLED_AREA(0);
             
-            switchShuffleCollections(switcher++,rectList);
-            k = new Knapsack(rectList);
+            switchShuffleCollections(switchSortStrategy++,rectListOrigin);
+            k = new Knapsack(rectListOrigin);
             
-            k.go();
+            localBest_iloscOdpadow = k.pack();
             
-            Main.BEST_VALUE = Math.min(Main.BEST_VALUE, k.iloscOdpadow);
+            Main.BEST_VALUE = Math.min(Main.BEST_VALUE, localBest_iloscOdpadow);
             
             if(Main.BEST_VALUE == 0)
                 break;
@@ -98,34 +98,69 @@ public class Main
         
         if(Main.getTEST())
         {
-            System.out.println("Ilosc prob: "+ (switcher-1) );
+            System.out.println("Ilosc prob: "+ (switchSortStrategy) );
             System.out.println("Czas wykonania programu: "+ ((System.currentTimeMillis() - startTime)/1000.0) +" sec" );
         }
-        
         
         System.out.println("Ilosc odpadow = " + Main.BEST_VALUE );
     }    
 
-    public static void/*List<Rectangle>*/ switchShuffleCollections(int i, List<Rectangle> rectList)
+    public static List<Rectangle> switchShuffleCollections(int i, List<Rectangle> rectList)
     {
         switch(i)
         {
-            case 1:     Collections.sort(rectList,new AscRectComparator());
+            case 0:     Collections.sort(rectList,new AscRectComparator());
                 break;
-            case 2:     Collections.sort(rectList,new DescRectComparator());
+            case 1:     Collections.sort(rectList,new DescRectComparator());
                 break;
-            case 3:     int tmpSize = rectList.size();
-                        List<Rectangle> tmp1 = rectList.subList(0, tmpSize/2);
-                        List<Rectangle> tmp2 = rectList.subList(tmpSize/2, tmpSize);
-                        Collections.sort(tmp1, new DescRectComparator());
-                        Collections.sort(tmp2, new AscRectComparator());
-                        tmp1.addAll(tmp2);
-                        rectList = tmp1;
-//                        rectList.addAll(tmp1);
+            case 2:     rectList = rectListSorter(rectList,0);
+                break;
+            case 3:     rectList = rectListSorter(rectList,1);
+                break;
+            case 4:     Collections.sort(rectList,new AscRectComparator());
+                        rectList = rectListSorter(rectList,0);
+                break;
+            case 5:     Collections.sort(rectList,new DescRectComparator());
+                        rectList = rectListSorter(rectList,0);
+                break;
+            case 6:     Collections.sort(rectList,new AscRectComparator());
+                        rectList = rectListSorter(rectList,1);
+                break;
+            case 7:     Collections.sort(rectList,new DescRectComparator());
+                        rectList = rectListSorter(rectList,1);
+                break;
+            case 8:     Collections.shuffle(rectList);
+                        rectList = rectListSorter(rectList,0);
+                break;
+            case 9:     Collections.shuffle(rectList);
+                        rectList = rectListSorter(rectList,1);
                 break;
             default:    Collections.shuffle(rectList);
                 break;        
         }
+        return rectList;
+    }
+    
+    private static List<Rectangle> rectListSorter(List<Rectangle> rectList, int caseNum)
+    {
+        int tmpSize = rectList.size();
+        List<Rectangle> tmp1 = rectList.subList(0, tmpSize/2);
+        List<Rectangle> tmp2 = rectList.subList(tmpSize/2, tmpSize);
+        
+        switch(caseNum)
+        {
+            case 0: 
+                Collections.sort(tmp1, new DescRectComparator());
+                Collections.sort(tmp2, new AscRectComparator());
+                break;
+            case 1:
+                Collections.sort(tmp1, new AscRectComparator());
+                Collections.sort(tmp2, new DescRectComparator());
+                break;
+        }        
+        
+        tmp1.addAll(tmp2);
+        return tmp1;
     }
     
     /**
@@ -182,5 +217,21 @@ public class Main
     public static void setTOTAL_SURFACE_SIZE(int aTOTAL_SURFACE_SIZE)
     {
         TOTAL_SURFACE_SIZE = aTOTAL_SURFACE_SIZE;
+    }
+
+    /**
+     * @return the DEADLINE
+     */
+    public static long getDEADLINE()
+    {
+        return DEADLINE;
+    }
+
+    /**
+     * @param aDEADLINE the DEADLINE to set
+     */
+    public static void setDEADLINE(long aDEADLINE)
+    {
+        DEADLINE = aDEADLINE;
     }
 }
