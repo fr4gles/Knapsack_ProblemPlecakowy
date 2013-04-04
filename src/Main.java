@@ -17,11 +17,17 @@ public class Main
     private static int SURFACE_SIZE;
     private static int TOTAL_SURFACE_SIZE;
     private static int FILLED_AREA;
-    private static Boolean TEST = Boolean.TRUE;
+    private static Boolean TEST = Boolean.FALSE;
     private static int BEST_VALUE;
     
     public static void main(String[] args) 
     {
+        long startTime = 0;
+        if(Main.getTEST())
+        {
+            startTime = System.currentTimeMillis();
+        }
+        
         if(args.length < 2) // jesli zla ilosc argumentow wejsciowych to poinforuj o tym uzytkownika
         {
             System.err.println("BLAD, zla ilosc argumentow wejsciowych. Podaj <nazwa_pliku> <wielkosc_tafli>");
@@ -84,9 +90,6 @@ public class Main
             
             k.go();
             
-            if(Main.getTEST())
-                System.out.println("Obecna ilosc odpadow = "+k.iloscOdpadow);
-            
             Main.BEST_VALUE = Math.min(Main.BEST_VALUE, k.iloscOdpadow);
             
             if(Main.BEST_VALUE == 0)
@@ -96,10 +99,11 @@ public class Main
         if(Main.getTEST())
         {
             System.out.println("Ilosc prob: "+ (switcher-1) );
+            System.out.println("Czas wykonania programu: "+ ((System.currentTimeMillis() - startTime)/1000.0) +" sec" );
         }
         
-        System.out.println("Ilosc odpadow = " + Main.BEST_VALUE );
         
+        System.out.println("Ilosc odpadow = " + Main.BEST_VALUE );
     }    
 
     public static void/*List<Rectangle>*/ switchShuffleCollections(int i, List<Rectangle> rectList)
@@ -109,6 +113,15 @@ public class Main
             case 1:     Collections.sort(rectList,new AscRectComparator());
                 break;
             case 2:     Collections.sort(rectList,new DescRectComparator());
+                break;
+            case 3:     int tmpSize = rectList.size();
+                        List<Rectangle> tmp1 = rectList.subList(0, tmpSize/2);
+                        List<Rectangle> tmp2 = rectList.subList(tmpSize/2, tmpSize);
+                        Collections.sort(tmp1, new DescRectComparator());
+                        Collections.sort(tmp2, new AscRectComparator());
+                        tmp1.addAll(tmp2);
+                        rectList = tmp1;
+//                        rectList.addAll(tmp1);
                 break;
             default:    Collections.shuffle(rectList);
                 break;        
