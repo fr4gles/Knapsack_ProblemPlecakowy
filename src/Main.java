@@ -78,15 +78,28 @@ public class Main
 
         int switchSortStrategy = 0;
         int localBest_iloscOdpadow = 0;
+        
+        int localSortType = 0;
+        int localLimit = 0;
+        
         Main.BEST_VALUE = Main.getTOTAL_SURFACE_SIZE();
         while(true)
         {
             if( System.currentTimeMillis() > endTime || System.currentTimeMillis() > Main.getDEADLINE())
                 break;
 
+            if(localLimit++ > 20)
+            {
+                localSortType++;
+                localLimit = 0;
+                
+                if(localSortType > 2)
+                    localSortType = 0;
+            }
+            
             Main.setFILLED_AREA(0);
             
-            switchShuffleCollections(switchSortStrategy++,rectListOrigin);
+            switchShuffleCollections(switchSortStrategy++,rectListOrigin,wybierzTrybSortowania(localSortType));
             k = new Knapsack(rectListOrigin);
             
             localBest_iloscOdpadow = k.pack();
@@ -99,42 +112,43 @@ public class Main
         
         if(Main.getTEST())
         {
-            System.out.println("Ilosc prob: "+ (switchSortStrategy) );
+            System.out.println("Sort type: "+ localSortType );
+            System.out.println("Ilosc prob: "+ switchSortStrategy );
             System.out.println("Czas wykonania programu: "+ ((System.currentTimeMillis() - startTime)/1000.0) +" sec" );
         }
         
         System.out.println("Ilosc odpadow = " + Main.BEST_VALUE );
     }    
 
-    public static List<Rectangle> switchShuffleCollections(int i, List<Rectangle> rectList)
+    public static List<Rectangle> switchShuffleCollections(int i, List<Rectangle> rectList, Order ord)
     {
         switch(i)
         {
-            case 0:     Collections.sort(rectList,new AscRectComparator());
+            case 0:     Collections.sort(rectList,new AscRectComparator(ord));
                 break;
-            case 1:     Collections.sort(rectList,new DescRectComparator());
+            case 1:     Collections.sort(rectList,new DescRectComparator(ord));
                 break;
-            case 2:     rectList = rectListSorter(rectList,0);
+            case 2:     rectList = rectListSorter(rectList,0,ord);
                 break;
-            case 3:     rectList = rectListSorter(rectList,1);
+            case 3:     rectList = rectListSorter(rectList,1,ord);
                 break;
-            case 4:     Collections.sort(rectList,new AscRectComparator());
-                        rectList = rectListSorter(rectList,0);
+            case 4:     Collections.sort(rectList,new AscRectComparator(ord));
+                        rectList = rectListSorter(rectList,0,ord);
                 break;
-            case 5:     Collections.sort(rectList,new DescRectComparator());
-                        rectList = rectListSorter(rectList,0);
+            case 5:     Collections.sort(rectList,new DescRectComparator(ord));
+                        rectList = rectListSorter(rectList,0,ord);
                 break;
-            case 6:     Collections.sort(rectList,new AscRectComparator());
-                        rectList = rectListSorter(rectList,1);
+            case 6:     Collections.sort(rectList,new AscRectComparator(ord));
+                        rectList = rectListSorter(rectList,1,ord);
                 break;
-            case 7:     Collections.sort(rectList,new DescRectComparator());
-                        rectList = rectListSorter(rectList,1);
+            case 7:     Collections.sort(rectList,new DescRectComparator(ord));
+                        rectList = rectListSorter(rectList,1,ord);
                 break;
             case 8:     Collections.shuffle(rectList);
-                        rectList = rectListSorter(rectList,0);
+                        rectList = rectListSorter(rectList,0,ord);
                 break;
             case 9:     Collections.shuffle(rectList);
-                        rectList = rectListSorter(rectList,1);
+                        rectList = rectListSorter(rectList,1,ord);
                 break;
             default:    Collections.shuffle(rectList);
                 break;        
@@ -142,32 +156,17 @@ public class Main
         return rectList;
     }
     
-            private static int i = 0;
-
-    /**
-     * @return the i
-     */
-    public static int getI()
+    private static Order wybierzTrybSortowania(int tryb)
     {
-        return i;
+        switch(tryb)
+        {
+            case 0:     return Order.Area;
+            case 1:     return Order.Height;
+            case 2:     return Order.Width; 
+        }
+        throw new RuntimeException("Practically unreachable code, can't be thrown");
     }
-
-    /**
-     * @param aI the i to set
-     */
-    public static void setI(int aI)
-    {
-        i = aI;
-    }
-    
-    private static Order wybierzTrybSortowania()
-    {
-
-        Order o = Order.Area;
-        
-        return o;
-    }
-    private static List<Rectangle> rectListSorter(List<Rectangle> rectList, int caseNum)
+    private static List<Rectangle> rectListSorter(List<Rectangle> rectList, int caseNum, Order ord)
     {
         int tmpSize = rectList.size();
         List<Rectangle> tmp1 = rectList.subList(0, tmpSize/2);
@@ -176,12 +175,12 @@ public class Main
         switch(caseNum)
         {
             case 0: 
-                Collections.sort(tmp1, new DescRectComparator());
-                Collections.sort(tmp2, new AscRectComparator());
+                Collections.sort(tmp1, new DescRectComparator(ord));
+                Collections.sort(tmp2, new AscRectComparator(ord));
                 break;
             case 1:
-                Collections.sort(tmp1, new AscRectComparator());
-                Collections.sort(tmp2, new DescRectComparator());
+                Collections.sort(tmp1, new AscRectComparator(ord));
+                Collections.sort(tmp2, new DescRectComparator(ord));
                 break;
         }        
         
