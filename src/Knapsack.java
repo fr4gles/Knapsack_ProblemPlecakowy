@@ -207,9 +207,7 @@ abstract class RectComparator implements Comparator<Rectangle>
     {
         this.sortingBy = Order.Area;
     }
-    
-    
-    
+
     @Override
     abstract public int compare(Rectangle rect1, Rectangle rect2);
 }

@@ -1,3 +1,4 @@
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -6,175 +7,210 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-    
 /**
- * Główna klasa programu
- * Odpowiada za wykorzystanie logiki zawartej w Klasie Graph do znalezienia slabych skladowych spojnych
+ * Główna klasa programu Odpowiada za wykorzystanie logiki zawartej w Klasie
+ * Graph do znalezienia slabych skladowych spojnych
+ *
  * @author Michal
  * @date 22.03.2013
  */
-public class Main 
+public class Main
 {
+
     private static int SURFACE_SIZE;
     private static int TOTAL_SURFACE_SIZE;
     private static int FILLED_AREA;
     private static Boolean TEST = Boolean.TRUE;
     private static int BEST_VALUE;
     private static long DEADLINE;
-    
-    public static void main(String[] args) 
+
+    public static void main(String[] args)
     {
         long startTime = 0;
         setDEADLINE(System.currentTimeMillis() + 225000); // (3.75*60000) -> deadline wykonania zadania
-        
-        if(Main.getTEST())
+
+        if (Main.getTEST())
+        {
             startTime = System.currentTimeMillis();
-        
-        if(args.length < 2) // jesli zla ilosc argumentow wejsciowych to poinforuj o tym uzytkownika
+        }
+
+        if (args.length < 2) // jesli zla ilosc argumentow wejsciowych to poinforuj o tym uzytkownika
         {
             System.err.println("BLAD, zla ilosc argumentow wejsciowych. Podaj <nazwa_pliku> <wielkosc_tafli>");
             System.err.println("W pliku powinny znajdowac sie pary liczb calkowitych (w oraz h)");
             System.exit(1);
         }
-                
+
         try
         {
             Main.setSURFACE_SIZE(Integer.parseInt(args[1])); // czytanie z wejscia ilośći wierzchołków
             Main.setFILLED_AREA(0);
-            Main.setTOTAL_SURFACE_SIZE(Main.getSURFACE_SIZE()*Main.getSURFACE_SIZE());
+            Main.setTOTAL_SURFACE_SIZE(Main.getSURFACE_SIZE() * Main.getSURFACE_SIZE());
         }
-        catch(NumberFormatException e)
+        catch (NumberFormatException e)
         {
-            System.err.println("BLAD ZLY ROZMIAR"+e.getMessage());
+            System.err.println("BLAD ZLY ROZMIAR" + e.getMessage());
         }
-        
+
         List<Rectangle> rectListOrigin = new ArrayList<>();
-        
+
         File file = new File(args[0]); // użycie pliku wejsciowego do odczytu danych
-        try 
+        try
         {
             Scanner sc = new Scanner(file).useDelimiter("\\D+"); // pobieranie tylko liczb ...
-            while(sc.hasNext())
+            while (sc.hasNext())
             {
                 Integer w = sc.nextInt();
                 Integer h = sc.nextInt();
-                
+
                 rectListOrigin.add(new Rectangle(w, h));
             }
-        } 
-        catch (FileNotFoundException ex) 
-        {
-            System.err.println("BLAD Z PARSOWANIEM PLIKU WEJSCIOWEGO czy PLIK istnieje??? -> "+ex.getMessage());
         }
-        catch(NoSuchElementException ex)
+        catch (FileNotFoundException ex)
         {
-            if(Main.getTEST())
-                System.err.println("BLAD ZLY FORMAT KRAWEDZI -> "+ex.getMessage());
+            System.err.println("BLAD Z PARSOWANIEM PLIKU WEJSCIOWEGO czy PLIK istnieje??? -> " + ex.getMessage());
         }
-        
+        catch (NoSuchElementException ex)
+        {
+            if (Main.getTEST())
+            {
+                System.err.println("BLAD ZLY FORMAT KRAWEDZI -> " + ex.getMessage());
+            }
+        }
+
         Knapsack k = null;
-        
+
         long endTime = System.currentTimeMillis() + 180000; // (3*60000)
 
-        int switchSortStrategy = 0;
+        int localSortStrategy = 0;
         int localBest_iloscOdpadow = 0;
-        
+
         int localSortType = 0;
-        int localLimit = 0;
+        int localLimit = 9;
+
+        int localIloscProb = 0;
         
         Main.BEST_VALUE = Main.getTOTAL_SURFACE_SIZE();
-        while(true)
+        while (true)
         {
-            if( System.currentTimeMillis() > endTime || System.currentTimeMillis() > Main.getDEADLINE())
-                break;
-
-            if(localLimit++ > 20)
+            if (System.currentTimeMillis() > endTime || System.currentTimeMillis() > Main.getDEADLINE())
             {
-                localSortType++;
-                localLimit = 0;
-                
-                if(localSortType > 2)
-                    localSortType = 0;
+                break;
             }
-            
+
+            if ( (localSortStrategy > localLimit ) && (localLimit == 9) )
+            {
+                if (localSortType++ < 3)
+                {
+                    localSortStrategy = 0;
+                }
+                else
+                {
+                    localSortType = 0;
+                    localLimit++;
+                }
+            }
+            else
+                localSortType = 0;
+
             Main.setFILLED_AREA(0);
-            
-            switchShuffleCollections(switchSortStrategy++,rectListOrigin,wybierzTrybSortowania(localSortType));
+
+            rectListOrigin = switchShuffleCollections(localSortStrategy++, rectListOrigin, wybierzTrybSortowania(localSortType));
             k = new Knapsack(rectListOrigin);
-            
+
             localBest_iloscOdpadow = k.pack();
-            
+
             Main.BEST_VALUE = Math.min(Main.BEST_VALUE, localBest_iloscOdpadow);
             
-            if(Main.BEST_VALUE == 0)
-                break;
-        }
-        
-        if(Main.getTEST())
-        {
-            System.out.println("Sort type: "+ localSortType );
-            System.out.println("Ilosc prob: "+ switchSortStrategy );
-            System.out.println("Czas wykonania programu: "+ ((System.currentTimeMillis() - startTime)/1000.0) +" sec" );
-        }
-        
-        System.out.println("Ilosc odpadow = " + Main.BEST_VALUE );
-    }    
+            localIloscProb++;
 
-    public static List<Rectangle> switchShuffleCollections(int i, List<Rectangle> rectList, Order ord)
-    {
-        switch(i)
+            if (Main.BEST_VALUE == 0)
+            {
+                break;
+            }
+        }
+
+        if (Main.getTEST())
         {
-            case 0:     Collections.sort(rectList,new AscRectComparator(ord));
+            System.out.println("Sort type: " + localSortType);
+            System.out.println("Ilosc prob: " + localIloscProb);
+            System.out.println("Czas wykonania programu: " + ((System.currentTimeMillis() - startTime) / 1000.0) + " sec");
+        }
+
+        System.out.println("Ilosc odpadow = " + Main.BEST_VALUE);
+    }
+
+    public static List<Rectangle> switchShuffleCollections(int i, List<Rectangle> rL, Order ord)
+    {
+        List<Rectangle> rectList = new ArrayList<>(rL);
+        switch (i)
+        {
+            case 0:
+                Collections.sort(rectList, new AscRectComparator(ord));
                 break;
-            case 1:     Collections.sort(rectList,new DescRectComparator(ord));
+            case 1:
+                Collections.sort(rectList, new DescRectComparator(ord));
                 break;
-            case 2:     rectList = rectListSorter(rectList,0,ord);
+            case 2:
+                rectList = rectListSorter(rectList, 0, ord);
                 break;
-            case 3:     rectList = rectListSorter(rectList,1,ord);
+            case 3:
+                rectList = rectListSorter(rectList, 1, ord);
                 break;
-            case 4:     Collections.sort(rectList,new AscRectComparator(ord));
-                        rectList = rectListSorter(rectList,0,ord);
+            case 4:
+                Collections.sort(rectList, new AscRectComparator(ord));
+                rectList = rectListSorter(rectList, 0, ord);
                 break;
-            case 5:     Collections.sort(rectList,new DescRectComparator(ord));
-                        rectList = rectListSorter(rectList,0,ord);
+            case 5:
+                Collections.sort(rectList, new DescRectComparator(ord));
+                rectList = rectListSorter(rectList, 0, ord);
                 break;
-            case 6:     Collections.sort(rectList,new AscRectComparator(ord));
-                        rectList = rectListSorter(rectList,1,ord);
+            case 6:
+                Collections.sort(rectList, new AscRectComparator(ord));
+                rectList = rectListSorter(rectList, 1, ord);
                 break;
-            case 7:     Collections.sort(rectList,new DescRectComparator(ord));
-                        rectList = rectListSorter(rectList,1,ord);
+            case 7:
+                Collections.sort(rectList, new DescRectComparator(ord));
+                rectList = rectListSorter(rectList, 1, ord);
                 break;
-            case 8:     Collections.shuffle(rectList);
-                        rectList = rectListSorter(rectList,0,ord);
+            case 8:
+                Collections.shuffle(rectList);
+                rectList = rectListSorter(rectList, 0, ord);
                 break;
-            case 9:     Collections.shuffle(rectList);
-                        rectList = rectListSorter(rectList,1,ord);
+            case 9:
+                Collections.shuffle(rectList);
+                rectList = rectListSorter(rectList, 1, ord);
                 break;
-            default:    Collections.shuffle(rectList);
-                break;        
+            default:
+                Collections.shuffle(rectList);
+                break;
         }
         return rectList;
     }
-    
+
     private static Order wybierzTrybSortowania(int tryb)
     {
-        switch(tryb)
+        switch (tryb)
         {
-            case 0:     return Order.Area;
-            case 1:     return Order.Height;
-            case 2:     return Order.Width; 
+            case 0:
+                return Order.Area;
+            case 1:
+                return Order.Height;
+            case 2:
+                return Order.Width;
         }
         throw new RuntimeException("Practically unreachable code, can't be thrown");
     }
+
     private static List<Rectangle> rectListSorter(List<Rectangle> rectList, int caseNum, Order ord)
     {
         int tmpSize = rectList.size();
-        List<Rectangle> tmp1 = rectList.subList(0, tmpSize/2);
-        List<Rectangle> tmp2 = rectList.subList(tmpSize/2, tmpSize);
-        
-        switch(caseNum)
+        List<Rectangle> tmp1 = rectList.subList(0, tmpSize / 2);
+        List<Rectangle> tmp2 = rectList.subList(tmpSize / 2, tmpSize);
+
+        switch (caseNum)
         {
-            case 0: 
+            case 0:
                 Collections.sort(tmp1, new DescRectComparator(ord));
                 Collections.sort(tmp2, new AscRectComparator(ord));
                 break;
@@ -182,12 +218,12 @@ public class Main
                 Collections.sort(tmp1, new AscRectComparator(ord));
                 Collections.sort(tmp2, new DescRectComparator(ord));
                 break;
-        }        
-        
+        }
+
         tmp1.addAll(tmp2);
         return tmp1;
     }
-    
+
     /**
      * @return the SURFACE_SIZE
      */
