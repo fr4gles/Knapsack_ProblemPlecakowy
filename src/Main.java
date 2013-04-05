@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -262,7 +263,7 @@ public class Main
     }
 
     /**
-     * @param ustawia dlugosc boku z jakiego jest zbudowana plansza the SURFACE_SIZE to set
+     * @param aSURFACE_SIZE ustawia dlugosc boku z jakiego jest zbudowana plansza the SURFACE_SIZE to set
      */
     public static void setSURFACE_SIZE(int aSURFACE_SIZE)
     {
@@ -323,5 +324,126 @@ public class Main
     public static void setDEADLINE(long aDEADLINE)
     {
         DEADLINE = aDEADLINE;
+    }
+}
+
+
+/**
+ * Enum sluzacy do porzedstawienia wielkosci po jakiej bedziemy sortowac prostokaty
+ * wg algortmu, najefektywniejszym sposobem jest sortowanie po szerokosci (w sposob malejacy)
+ * @author Michal Franczyk 
+ */
+enum Order 
+{
+    Area,   // pole pow
+    Width,  // szerokosc
+    Height  // wysokosc
+}
+
+/**
+ * Klasa odpowiedzialna za możliwosc sortowania listy wlasnych obiektow prostokatow
+ * klasa komparator
+ * klasa abstrakcyjna
+ * @author Michal Franczyk 
+ */
+abstract class RectComparator implements Comparator<Rectangle> 
+{
+    protected Order sortingBy = Order.Width;    // domyslny tryb sortowania
+
+    /**
+     * konstruktor
+     */
+    public RectComparator()
+    {
+        this.sortingBy = Order.Width;
+    }
+
+    @Override
+    abstract public int compare(Rectangle rect1, Rectangle rect2);
+}
+
+/**
+ * klasa dziedziczy po RectComparator
+ * odpowiada za sortowanie prostokatow w sposob rosnacy
+ * @author Michal Franczyk 
+ */
+class AscRectComparator extends RectComparator
+{
+    /**
+     * konstruktor
+     */
+    public AscRectComparator()
+    {
+        super();
+    }
+    
+    /**
+     * konstruktor z wlasna inicjalizacja
+     * @param sortBy 
+     */
+    public AscRectComparator(Order sortBy)
+    {
+        this.sortingBy = sortBy;
+    }
+    
+    /**
+     * funckja odpowiadajaca za porownania
+     * pozwala na sortowanie
+     * @param rect1 pierwszy 
+     * @param rect2 drugi do porownania
+     * @return zgodnie z dokumentacja javy, to samo co zwraca compareTo
+     */
+    public int compare(Rectangle rect1, Rectangle rect2) 
+    {
+        switch(sortingBy)
+        {
+            case Area:      return rect1.Area().compareTo(rect2.Area());
+            case Width:     return rect1.GetWidth().compareTo(rect2.GetWidth());
+            case Height:    return rect1.GetHeight().compareTo(rect2.GetHeight());
+        }
+        throw new RuntimeException("Natrafilem na zly case | AscRectComparator");
+    }
+}
+
+/**
+ * klasa dziedziczy po RectComparator
+ * odpowiada za sortowanie prostokatow w sposob malejacy
+ * @author Michal Franczyk 
+ */
+class DescRectComparator extends RectComparator
+{
+    /**
+     * konstruktor
+     */
+    public DescRectComparator()
+    {
+        super();
+    }
+    
+    /**
+     * konstruktor z wlasna inicjalizacja
+     * @param sortBy 
+     */
+    public DescRectComparator(Order sortBy)
+    {
+        this.sortingBy = sortBy;
+    }
+
+    /**
+     * funckja odpowiadajaca za porownania
+     * pozwala na sortowanie
+     * @param rect1 pierwszy 
+     * @param rect2 drugi do porownania
+     * @return zgodnie z dokumentacja javy, to samo co zwraca compareTo
+     */
+    public int compare(Rectangle rect1, Rectangle rect2) 
+    {
+        switch(sortingBy)
+        {
+            case Area:      return rect2.Area().compareTo(rect1.Area());
+            case Width:     return rect2.GetWidth().compareTo(rect1.GetWidth());
+            case Height:    return rect2.GetHeight().compareTo(rect1.GetHeight());
+        }
+        throw new RuntimeException("Natrafilem na zly case | DescRectComparator");
     }
 }
