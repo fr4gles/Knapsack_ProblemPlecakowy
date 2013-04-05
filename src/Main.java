@@ -7,8 +7,8 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 /**
- * Główna klasa programu Odpowiada za wykorzystanie logiki zawartej w Klasie
- * Graph do znalezienia slabych skladowych spojnych
+ * Main -> obsluguje wczytywanie pliku oraz wielosci tafli
+ * zarzadza probami ulozenia klockow
  *
  * @author Michal
  * @date 22.03.2013

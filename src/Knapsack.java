@@ -2,34 +2,43 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
+ * Knapsack -> obsluguje algorytm do ukladania klockow
  *
  * @author Michal
+ * @date 22.03.2013
  */
 public class Knapsack 
 {
-    private Node rootNode;
-    private Integer iloscOdpadow;
-    private List<Rectangle> rectList;
+    private Node rootNode;              // przechowuje drzewo ulozen klockow
+    private Integer iloscOdpadow;       // ilosc odpadow
+    private List<Rectangle> rectList;   // lista prostokatow, ktore bedziemy probowac ulozyc
     
+    /**
+     * konstruktor ustawiajacy poczatkowe wartosci
+     * @param rectList lista prostokatow
+     */
     public Knapsack(List<Rectangle> rectList)
     {
         iloscOdpadow = 0;
         this.rectList = rectList;
     }
     
+    /**
+     * funkcja pack
+     * zarzadza ukladaniem klockow na planszy
+     * @return ilosc odpadow
+     */
     public int pack() 
     {        
-        InitOrResetRootNode();
+        InitOrResetRootNode();              // inicjalizacja lub reset wartosci poczatkowych
         
-        int iloscUzytychKlockow = 0;
-        for(Rectangle i: rectList)
+        int iloscUzytychKlockow = 0;        // zmienna na potrzeby testow, zerowanie ilosci uzytych klockow
+        for(Rectangle i: rectList)          // dla kazdego prostokata ...
         {            
-            Node tmp = rootNode.insert(i);
-
-            if(tmp!=null)
+            if(rootNode.insert(i)!=null)    // kazdego prostokata sprobuj postawic na planszy... jesli null to sie nie udalo --> nie mozna postawic wiecej :(
             {
-                Main.setFILLED_AREA(Main.getFILLED_AREA() + i.GetHeight()*i.GetWidth());
-                iloscUzytychKlockow++;
+                Main.setFILLED_AREA(Main.getFILLED_AREA() + i.GetHeight()*i.GetWidth());    // aktualizuj wielkosc jaka wypelniaja klocki na planszy
+                iloscUzytychKlockow++;  // aktualizuj ich ilosc
             }
         }
         
