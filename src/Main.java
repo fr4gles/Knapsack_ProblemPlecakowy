@@ -21,12 +21,12 @@ public class Main
     private static int TOTAL_SURFACE_SIZE;
     private static int FILLED_AREA;
     private static Boolean TEST = Boolean.TRUE;
-    private static int BEST_VALUE;
     private static long DEADLINE;
 
     public static void main(String[] args)
     {
         long startTime = 0;
+        int bestValue = 0;
         setDEADLINE(System.currentTimeMillis() + 225000); // (3.75*60000) -> deadline wykonania zadania
 
         if (Main.getTEST())
@@ -46,6 +46,7 @@ public class Main
             Main.setSURFACE_SIZE(Integer.parseInt(args[1])); // czytanie z wejscia ilośći wierzchołków
             Main.setFILLED_AREA(0);
             Main.setTOTAL_SURFACE_SIZE(Main.getSURFACE_SIZE() * Main.getSURFACE_SIZE());
+            bestValue = Main.getTOTAL_SURFACE_SIZE();
         }
         catch (NumberFormatException e)
         {
@@ -83,20 +84,17 @@ public class Main
         long endTime = System.currentTimeMillis() + 180000; // (3*60000)
 
         int localSortStrategy = 0;
-        int localBest_iloscOdpadow = 0;
 
         int localSortType = 0;
         int localLimit = 9;
 
         int localIloscProb = 0;
-        
-        Main.BEST_VALUE = Main.getTOTAL_SURFACE_SIZE();
+                
+        bestValue = Main.getTOTAL_SURFACE_SIZE();
         while (true)
         {
-            if (System.currentTimeMillis() > endTime || System.currentTimeMillis() > Main.getDEADLINE())
-            {
+            if (System.currentTimeMillis() > endTime || System.currentTimeMillis() > Main.getDEADLINE() || bestValue == 0)
                 break;
-            }
 
             if ( (localSortStrategy > localLimit ) && (localLimit == 9) )
             {
@@ -118,16 +116,9 @@ public class Main
             List<Rectangle> rectListCopy = switchShuffleCollections(localSortStrategy++, rectListOrigin, wybierzTrybSortowania(localSortType));
             k = new Knapsack(rectListCopy);
 
-            localBest_iloscOdpadow = k.pack();
-
-            Main.BEST_VALUE = Math.min(Main.BEST_VALUE, localBest_iloscOdpadow);
+            bestValue = Math.min(bestValue, k.pack());
             
             localIloscProb++;
-
-            if (Main.BEST_VALUE == 0)
-            {
-                break;
-            }
         }
 
         if (Main.getTEST())
@@ -137,7 +128,7 @@ public class Main
             System.out.println("Czas wykonania programu: " + ((System.currentTimeMillis() - startTime) / 1000.0) + " sec");
         }
 
-        System.out.println("Ilosc odpadow = " + Main.BEST_VALUE);
+        System.out.println("Ilosc odpadow = " + bestValue);
     }
 
     public static List<Rectangle> switchShuffleCollections(int i, List<Rectangle> rL, Order ord)
