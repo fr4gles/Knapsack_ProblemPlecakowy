@@ -348,7 +348,7 @@ enum Order
  */
 abstract class RectComparator implements Comparator<Rectangle> 
 {
-    protected Order sortingBy = Order.Width;    // domyslny tryb sortowania
+    protected Order sortingBy;    // domyslny tryb sortowania
 
     /**
      * konstruktor
