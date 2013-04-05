@@ -24,11 +24,10 @@ public class Knapsack
         int iloscUzytychKlockow = 0;
         for(Rectangle i: rectList)
         {            
+            iloscOdpadow = Main.getTOTAL_SURFACE_SIZE() - Main.getFILLED_AREA();
+
             if( ( Main.getTOTAL_SURFACE_SIZE() - (Main.getFILLED_AREA() + i.GetWidth()*i.GetHeight()) ) < 0)
-            {
-                iloscOdpadow = Main.getTOTAL_SURFACE_SIZE() - Main.getFILLED_AREA();
                 break;
-            }
 
             Node tmp = rootNode.insert(i);
 
@@ -37,8 +36,6 @@ public class Knapsack
                 Main.setFILLED_AREA(Main.getFILLED_AREA() + i.GetHeight()*i.GetWidth());
                 iloscUzytychKlockow++;
             }
-            
-            iloscOdpadow = Main.getTOTAL_SURFACE_SIZE() - Main.getFILLED_AREA();
         }
         
         if(Main.getTEST())
@@ -51,16 +48,17 @@ public class Knapsack
     {
         iloscOdpadow = 0;
         rootNode = new Node();
-        rootNode.rect = new Rectangle(Main.getSURFACE_SIZE(), Main.getSURFACE_SIZE());
+        rootNode.setRect(new Rectangle(Main.getSURFACE_SIZE(), Main.getSURFACE_SIZE()));
     }
 }
 
+
 class Node
 {
-    public Node left;
-    public Node right;
-    public Rectangle rect;
-    public Boolean filled = Boolean.FALSE;
+    private Node left;
+    private Node right;
+    private Rectangle rect;
+    private Boolean filled = Boolean.FALSE;
     
     public Node insert(Rectangle rect)
     {
@@ -101,17 +99,25 @@ class Node
         if(width_diff > height_diff)
         {
             // split literally into left and right, putting the rect on the left.
-            this.left.rect = new Rectangle(rect.GetWidth(), me.GetHeight(),me.GetX(), me.GetY());
-            this.right.rect = new Rectangle(me.GetWidth() - rect.GetWidth(), me.GetHeight(),me.GetX() + rect.GetWidth(), me.GetY());
+            this.left.setRect(new Rectangle(rect.GetWidth(), me.GetHeight(),me.GetX(), me.GetY()));
+            this.right.setRect(new Rectangle(me.GetWidth() - rect.GetWidth(), me.GetHeight(),me.GetX() + rect.GetWidth(), me.GetY()));
         }
         else
         {
             // split into top and bottom, putting rect on top.
-            this.left.rect = new Rectangle(me.GetWidth(), rect.GetHeight(),me.GetX(), me.GetY());
-            this.right.rect = new Rectangle(me.GetWidth(), me.GetHeight() - rect.GetHeight(), me.GetX(), me.GetY() + rect.GetHeight());
+            this.left.setRect(new Rectangle(me.GetWidth(), rect.GetHeight(),me.GetX(), me.GetY()));
+            this.right.setRect(new Rectangle(me.GetWidth(), me.GetHeight() - rect.GetHeight(), me.GetX(), me.GetY() + rect.GetHeight()));
         }
 
         return this.left.insert(rect);
+    }
+
+    /**
+     * @param rect the rect to set
+     */
+    public void setRect(Rectangle rect)
+    {
+        this.rect = rect;
     }
 }
 
