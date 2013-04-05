@@ -114,9 +114,9 @@ public class Main
                 localSortType = 0;
 
             Main.setFILLED_AREA(0);
-
-            rectListOrigin = switchShuffleCollections(localSortStrategy++, rectListOrigin, wybierzTrybSortowania(localSortType));
-            k = new Knapsack(rectListOrigin);
+            
+            List<Rectangle> rectListCopy = switchShuffleCollections(localSortStrategy++, rectListOrigin, wybierzTrybSortowania(localSortType));
+            k = new Knapsack(rectListCopy);
 
             localBest_iloscOdpadow = k.pack();
 
