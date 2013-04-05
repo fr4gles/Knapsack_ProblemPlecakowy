@@ -7,9 +7,9 @@ import java.util.List;
  */
 public class Knapsack 
 {
-    public Node rootNode;
-    public Integer iloscOdpadow;
-    public List<Rectangle> rectList;
+    private Node rootNode;
+    private Integer iloscOdpadow;
+    private List<Rectangle> rectList;
     
     public Knapsack(List<Rectangle> rectList)
     {
@@ -26,8 +26,8 @@ public class Knapsack
         {            
             iloscOdpadow = Main.getTOTAL_SURFACE_SIZE() - Main.getFILLED_AREA();
 
-            if( ( Main.getTOTAL_SURFACE_SIZE() - (Main.getFILLED_AREA() + i.GetWidth()*i.GetHeight()) ) < 0)
-                break;
+//            if( ( Main.getTOTAL_SURFACE_SIZE() - (Main.getFILLED_AREA() + i.GetWidth()*i.GetHeight()) ) < 0)
+//                break;
 
             Node tmp = rootNode.insert(i);
 
@@ -82,7 +82,7 @@ class Node
         if(!rect.fitsIn(this.rect))
             return null;
         
-        if(rect.isSameSize(this.rect))
+        if(rect.isSameSizeAs(this.rect))
         {
             this.filled = Boolean.TRUE;
             return this;
@@ -91,12 +91,12 @@ class Node
         this.left = new Node();
         this.right = new Node();
         
-        Integer width_diff = this.rect.GetWidth() - rect.GetWidth();
-        Integer height_diff = this.rect.GetHeight() - rect.GetHeight();
+        Integer widthDiff = this.rect.GetWidth() - rect.GetWidth();
+        Integer heightDiff = this.rect.GetHeight() - rect.GetHeight();
         
         Rectangle me = this.rect;
         
-        if(width_diff > height_diff)
+        if(widthDiff > heightDiff)
         {
             // split literally into left and right, putting the rect on the left.
             this.left.setRect(new Rectangle(rect.GetWidth(), me.GetHeight(),me.GetX(), me.GetY()));
@@ -145,7 +145,7 @@ class Rectangle
                 && (rect.GetHeight() >= this.GetHeight());
     }
     
-    public Boolean isSameSize(Rectangle rect)
+    public Boolean isSameSizeAs(Rectangle rect)
     {
         return (rect.GetWidth() == this.GetWidth())
                 && (rect.GetHeight() == this.GetHeight());
@@ -156,20 +156,10 @@ class Rectangle
         width = w;
         height = h;
         
-        SetX(x);
-        SetY(y);
+        x_pos = x;
+        y_pos = y;
         
         area = width * height;
-    }
-    
-    public void SetX(Integer x)
-    {
-        x_pos = x;
-    }
-    
-    public void SetY(Integer y)
-    {
-        y_pos = y;
     }
     
     public Integer GetX()
@@ -217,6 +207,7 @@ abstract class RectComparator implements Comparator<Rectangle>
     @Override
     abstract public int compare(Rectangle rect1, Rectangle rect2);
 }
+
 class AscRectComparator extends RectComparator
 {
     public AscRectComparator()
@@ -236,7 +227,7 @@ class AscRectComparator extends RectComparator
             case Width:     return rect1.GetWidth().compareTo(rect2.GetWidth());
             case Height:    return rect1.GetHeight().compareTo(rect2.GetHeight());
         }
-        throw new RuntimeException("Practically unreachable code, can't be thrown");
+        throw new RuntimeException("Natrafilem na zly case | AscRectComparator");
     }
 }
 
@@ -260,6 +251,6 @@ class DescRectComparator extends RectComparator
             case Width:     return rect2.GetWidth().compareTo(rect1.GetWidth());
             case Height:    return rect2.GetHeight().compareTo(rect1.GetHeight());
         }
-        throw new RuntimeException("Practically unreachable code, can't be thrown");
+        throw new RuntimeException("Natrafilem na zly case | DescRectComparator");
     }
 }

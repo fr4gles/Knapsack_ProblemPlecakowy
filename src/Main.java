@@ -91,10 +91,13 @@ public class Main
                 
         while (true)
         {
-            if (System.currentTimeMillis() > endTime || System.currentTimeMillis() > Main.getDEADLINE() || bestValue == 0)
+            if (System.currentTimeMillis() > endTime 
+                    || System.currentTimeMillis() > Main.getDEADLINE() 
+                    || bestValue == 0)
                 break;
 
-            if ( (localSortStrategy > localLimit ) && (localLimit == 9) )
+            if ( (localSortStrategy > localLimit ) 
+                    && (localLimit == 9) )
             {
                 if (localSortType++ < 3)
                     localSortStrategy = 0;
@@ -124,7 +127,7 @@ public class Main
         System.out.println("Ilosc odpadow = " + bestValue);
     }
 
-    public static List<Rectangle> switchShuffleCollections(int i, List<Rectangle> rectListOrigin, Order ord)
+    private static List<Rectangle> switchShuffleCollections(int i, List<Rectangle> rectListOrigin, Order ord)
     {
         List<Rectangle> rectListLocalCopy = new ArrayList<>(rectListOrigin);
         switch (i)
@@ -183,7 +186,7 @@ public class Main
             case 2:
                 return Order.Width;
         }
-        throw new RuntimeException("Practically unreachable code, can't be thrown");
+        throw new RuntimeException("Natrafilem na zly case | wybierzTrybSortowania");
     }
 
     private static List<Rectangle> rectListSorter(List<Rectangle> rectList, int caseNum, Order ord)
