@@ -1,4 +1,3 @@
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -16,24 +15,23 @@ import java.util.Scanner;
  */
 public class Main
 {
-
-    private static int SURFACE_SIZE;
-    private static int TOTAL_SURFACE_SIZE;
-    private static int FILLED_AREA;
-    private static Boolean TEST = Boolean.TRUE;
-    private static long DEADLINE;
+    private static int SURFACE_SIZE;            // wielkosc planszy okreslona dlugoscia boku ...
+    private static int TOTAL_SURFACE_SIZE;      // całkowita powierzchnia planszy
+    private static int FILLED_AREA;             // pole powierzchni klocków ułożonych na planszy
+    private static Boolean TEST = Boolean.TRUE; // test ...
+    private static long DEADLINE;               //czas w jakis algorytm musi zakonczyc działanie
+                                                // jeśli zostanie przekroczony to program konczy dzialanie bez wzgledu na ilosc ulozonych klockow
 
     public static void main(String[] args)
     {
-        long startTime = 0;
-        int bestValue = 0;
+        long startTime = 0; // czas startu programu, do testów ...
+        int bestValue = 0;  // wartosc ilosci odpadow, najlepsza --> najmniejsza ze wszystkich 
+        
         setDEADLINE(System.currentTimeMillis() + 225000); // (3.75*60000) -> deadline wykonania zadania 3.75 min
 
         if (Main.getTEST())
-        {
             startTime = System.currentTimeMillis();
-        }
-
+        
         if (args.length < 2) // jesli zla ilosc argumentow wejsciowych to poinforuj o tym uzytkownika
         {
             System.err.println("BLAD, zla ilosc argumentow wejsciowych. Podaj <nazwa_pliku> <wielkosc_tafli>");
@@ -43,14 +41,16 @@ public class Main
 
         try
         {
-            Main.setSURFACE_SIZE(Integer.parseInt(args[1])); // czytanie z wejscia ilośći wierzchołków
-            Main.setTOTAL_SURFACE_SIZE(Main.getSURFACE_SIZE() * Main.getSURFACE_SIZE());
-            bestValue = Main.getTOTAL_SURFACE_SIZE();
+            Main.setSURFACE_SIZE(Integer.parseInt(args[1])); // czytanie z wejscia wielkosc tafli
         }
         catch (NumberFormatException e)
         {
             System.err.println("BLAD ZLY ROZMIAR" + e.getMessage());
         }
+
+        // ustawianie poczatkowych wielkosci
+        Main.setTOTAL_SURFACE_SIZE(Main.getSURFACE_SIZE() * Main.getSURFACE_SIZE());
+        bestValue = Main.getTOTAL_SURFACE_SIZE();
 
         List<Rectangle> rectListOrigin = new ArrayList<>();
 
@@ -63,7 +63,7 @@ public class Main
                 Integer w = sc.nextInt();
                 Integer h = sc.nextInt();
 
-                rectListOrigin.add(new Rectangle(w, h));
+                rectListOrigin.add(new Rectangle(w, h)); // dodawanie prostokatow do listy
             }
         }
         catch (FileNotFoundException ex)
@@ -78,41 +78,60 @@ public class Main
             }
         }
 
+        // obiekt odpowiadajacy za obsluge rozwiazania problemu
         Knapsack k = null;
 
-        long endTime = System.currentTimeMillis() + 180000; // (3*60000), 3min
+        // czas po jakim spodziewamy sie skonczenia programu
+        // jesli program przekroczy czas endTime to przy następnej iteracji przerwie działanie
+        long endTime = System.currentTimeMillis() + 30000; // (3*60000), 3min
 
+        // zmienna odpowidajaca za zmiane strategi kolejnosci ulozenia klockow w liscie
+        // wiecej w switchShuffleCollections
         int localSortStrategy = 0;
 
+        // zmienna odpowiedzialna za zmiane wielkosci po jakiej prostokaty beda sortowane
+        // wiecej w wybierzTrybSortowania
+        // 0 pole, 1 wysokosc, 2 szerokosc
         int localSortType = 0;
-        int localLimit = 9;
+        
+        // zmienna potrzebna do zerowania trybow sortowania
+        // zerowanie nastepuje gdy zaprogramowane możliwości rozwiązania z sortowaniem zawiodły
+        // wtedy program przerzuca się na losowanie kolejnosci układania klocków
+        // 9 jest wartoscią stala, niezbyt wazna
+        int localLimit = 9;     
 
+        // wielkosc opisuje ilosc prob ułożeń klocków jakie zdolal wykonać progam podczas dzialania
         int localIloscProb = 0;
                 
-        while (true)
+        while (true)    // wykonuj / probuj ulozyc prostokaty az 
         {
-            if (System.currentTimeMillis() > endTime 
-                    || System.currentTimeMillis() > Main.getDEADLINE() 
-                    || bestValue == 0)
-                break;
+            if (System.currentTimeMillis() > endTime                    // jesli obecny czas jest wiekszy niz czas wyznaczony do zakonczenia to ..
+                    || System.currentTimeMillis() > Main.getDEADLINE()  // lub jeśli przekroczyliśmy deadline (bardzo male pradopodobienstwo wystapienia)
+                    || bestValue == 0)                                  // lub jesli znalezlismy optymalne rozwiazanie 
+                break;                                                  // ... wtedy zakoncz petle
 
-            if ( (localSortStrategy > localLimit ) 
-                    && (localLimit == 9) )
-            {
-                if (localSortType++ < 3)
-                    localSortStrategy = 0;
-                else
-                    localLimit++;
+            if ( (localSortStrategy > localLimit)   // jesli przekroczylismy limit 
+                    && (localLimit == 9) )          // lub jesli limit zostal zmieniony
+            {                                       // wtedy:
+                if (localSortType++ < 3)                // jesli jest mniejsze od 3
+                    localSortStrategy = 0;              // zeruj
+                else                                    // jesli nie
+                    localLimit++;                       // zwieksz limit
             }
-            else
-                localSortType = 0;
+            else                                    // jesli nie 
+                localSortType = 0;                  // zeruj typ sortowania, tak na prawde nie on juz znaczenia --> losowe wybieranie kolejnosci ale na potrzeby algorytmu jest 0
 
-            Main.setFILLED_AREA(0);
+            Main.setFILLED_AREA(0);                 // za kazda proba 0 ilosc zajetej przez klocki powierzchni
             
+            // stworz liste prostokatow, których kolejnosc okresla funkcja switchShuffleCollections
             List<Rectangle> rectListCopy = switchShuffleCollections(localSortStrategy++, rectListOrigin, wybierzTrybSortowania(localSortType));
-            k = new Knapsack(rectListCopy);
-
-            bestValue = Math.min(bestValue, k.pack());
+            
+            // przekaz kopie do obiektu 
+            k = new Knapsack(rectListCopy);             
+            
+            // wylicz ilsoc odpadow, jako min z kazdej proby wykonania
+            // pack() zwraca ilosc odpadow z obecnego ulozenia
+            bestValue = Math.min(bestValue, k.pack());  
             
             localIloscProb++;
         }
@@ -127,54 +146,67 @@ public class Main
         System.out.println("Ilosc odpadow = " + bestValue);
     }
 
+    /**
+     * wybieranie sortowania sposrob 9 zaprogramowanych mozliwosci
+     * 10 mozliwosc do juz tylko randomowa kolejnosc listy prostokatow
+     * @param i typ sortownia
+     * @param rectListOrigin lista do sortowania
+     * @param ord po czym bedziemy sortowac
+     * @return ulozona wybranych sposobem liste klockow
+     */
     private static List<Rectangle> switchShuffleCollections(int i, List<Rectangle> rectListOrigin, Order ord)
     {
         List<Rectangle> rectListLocalCopy = new ArrayList<>(rectListOrigin);
         switch (i)
         {
-            case 0:
+            case 0:     // sortuj rosnaco
                 Collections.sort(rectListLocalCopy, new AscRectComparator(ord));
                 break;
-            case 1:
+            case 1:     // sortuj malejaco
                 Collections.sort(rectListLocalCopy, new DescRectComparator(ord));
                 break;
-            case 2:
+            case 2:     // sortuj "polowicznie" ... wiecej info w rectListSorter
                 rectListLocalCopy = rectListSorter(rectListLocalCopy, 0, ord);
                 break;
-            case 3:
+            case 3:     // sortuj "polowicznie" ... wiecej info w rectListSorter
                 rectListLocalCopy = rectListSorter(rectListLocalCopy, 1, ord);
                 break;
-            case 4:
+            case 4:     // sortuj "polowicznie" ... wiecej info w rectListSorter
                 Collections.sort(rectListLocalCopy, new AscRectComparator(ord));
                 rectListLocalCopy = rectListSorter(rectListLocalCopy, 0, ord);
                 break;
-            case 5:
+            case 5:     // sortuj "polowicznie" ... wiecej info w rectListSorter
                 Collections.sort(rectListLocalCopy, new DescRectComparator(ord));
                 rectListLocalCopy = rectListSorter(rectListLocalCopy, 0, ord);
                 break;
-            case 6:
+            case 6:     // sortuj "polowicznie" ... wiecej info w rectListSorter
                 Collections.sort(rectListLocalCopy, new AscRectComparator(ord));
                 rectListLocalCopy = rectListSorter(rectListLocalCopy, 1, ord);
                 break;
-            case 7:
+            case 7:     // sortuj "polowicznie" ... wiecej info w rectListSorter
                 Collections.sort(rectListLocalCopy, new DescRectComparator(ord));
                 rectListLocalCopy = rectListSorter(rectListLocalCopy, 1, ord);
                 break;
-            case 8:
+            case 8:     // sortuj "polowicznie" ... wiecej info w rectListSorter
                 Collections.shuffle(rectListLocalCopy);
                 rectListLocalCopy = rectListSorter(rectListLocalCopy, 0, ord);
                 break;
-            case 9:
+            case 9:     // sortuj "polowicznie" ... wiecej info w rectListSorter
                 Collections.shuffle(rectListLocalCopy);
                 rectListLocalCopy = rectListSorter(rectListLocalCopy, 1, ord);
                 break;
-            default:
+            default:    // losowanie kolejnosci prostokatow
                 Collections.shuffle(rectListLocalCopy);
                 break;
         }
         return rectListLocalCopy;
     }
 
+    /**
+     * wybiera po czym bedziemy sortowac klocki
+     * @param tryb tryb sortowania
+     * @return po czym sortujemy
+     */
     private static Order wybierzTrybSortowania(int tryb)
     {
         switch (tryb)
@@ -189,19 +221,29 @@ public class Main
         throw new RuntimeException("Natrafilem na zly case | wybierzTrybSortowania");
     }
 
+    /**
+     * "sprytniejszy" sposob sortowania
+     * sprawdza sie przewaznie dla zbiorow ktorych calkowita powierzchnia jest blicka powierzchni planszy
+     * @param rectList lista do ulozenia
+     * @param caseNum zorpatrywany przypadek
+     * @param ord po czym sortujemy
+     * @return ulozona lista
+     */
     private static List<Rectangle> rectListSorter(List<Rectangle> rectList, int caseNum, Order ord)
     {
-        int tmpSize = rectList.size();
-        List<Rectangle> tmp1 = rectList.subList(0, tmpSize / 2);
+        int tmpSize = rectList.size(); // kopia rozmiaru
+        
+        // podzial listy na dwie tymczasowe
+        List<Rectangle> tmp1 = rectList.subList(0, tmpSize / 2);        
         List<Rectangle> tmp2 = rectList.subList(tmpSize / 2, tmpSize);
 
         switch (caseNum)
         {
-            case 0:
+            case 0:     // najpier sortuj malejaco a potem rosnaco
                 Collections.sort(tmp1, new DescRectComparator(ord));
                 Collections.sort(tmp2, new AscRectComparator(ord));
                 break;
-            case 1:
+            case 1:     // odwrotnie do czas 0
                 Collections.sort(tmp1, new AscRectComparator(ord));
                 Collections.sort(tmp2, new DescRectComparator(ord));
                 break;
@@ -212,7 +254,7 @@ public class Main
     }
 
     /**
-     * @return the SURFACE_SIZE
+     * @return zwraca dlugosc boku z jakiego jest zbudowana plansza
      */
     public static int getSURFACE_SIZE()
     {
@@ -220,7 +262,7 @@ public class Main
     }
 
     /**
-     * @param aSURFACE_SIZE the SURFACE_SIZE to set
+     * @param ustawia dlugosc boku z jakiego jest zbudowana plansza the SURFACE_SIZE to set
      */
     public static void setSURFACE_SIZE(int aSURFACE_SIZE)
     {
@@ -228,7 +270,7 @@ public class Main
     }
 
     /**
-     * @return the TEST
+     * @return zwraca test
      */
     public static Boolean getTEST()
     {
@@ -236,7 +278,7 @@ public class Main
     }
 
     /**
-     * @return the FILLED_AREA
+     * @return wielkosc zapelnionej powierzchni
      */
     public static int getFILLED_AREA()
     {
@@ -252,7 +294,7 @@ public class Main
     }
 
     /**
-     * @return the TOTAL_SURFACE_SIZE
+     * @return calkowita powierzchnie planszy
      */
     public static int getTOTAL_SURFACE_SIZE()
     {
@@ -268,7 +310,7 @@ public class Main
     }
 
     /**
-     * @return the DEADLINE
+     * @return czas w jakim program musi się zakonczyc
      */
     public static long getDEADLINE()
     {

@@ -24,11 +24,6 @@ public class Knapsack
         int iloscUzytychKlockow = 0;
         for(Rectangle i: rectList)
         {            
-            iloscOdpadow = Main.getTOTAL_SURFACE_SIZE() - Main.getFILLED_AREA();
-
-//            if( ( Main.getTOTAL_SURFACE_SIZE() - (Main.getFILLED_AREA() + i.GetWidth()*i.GetHeight()) ) < 0)
-//                break;
-
             Node tmp = rootNode.insert(i);
 
             if(tmp!=null)
@@ -37,6 +32,8 @@ public class Knapsack
                 iloscUzytychKlockow++;
             }
         }
+        
+        iloscOdpadow = Main.getTOTAL_SURFACE_SIZE() - Main.getFILLED_AREA();
         
         if(Main.getTEST())
             System.out.println("Ilosc uzytych klockow: "+iloscUzytychKlockow+"      "+"Obecna ilosc odpadow = "+iloscOdpadow);
