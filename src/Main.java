@@ -19,7 +19,7 @@ public class Main
     private static int SURFACE_SIZE;            // wielkosc planszy okreslona dlugoscia boku ...
     private static int TOTAL_SURFACE_SIZE;      // całkowita powierzchnia planszy
     private static int FILLED_AREA;             // pole powierzchni klocków ułożonych na planszy
-    private static Boolean TEST = Boolean.TRUE; // test ...
+    private static Boolean TEST = Boolean.FALSE; // test ...
     private static long DEADLINE;               //czas w jakis algorytm musi zakonczyc działanie
                                                 // jeśli zostanie przekroczony to program konczy dzialanie bez wzgledu na ilosc ulozonych klockow
 
@@ -144,7 +144,7 @@ public class Main
             System.out.println("Czas wykonania programu: " + ((System.currentTimeMillis() - startTime) / 1000.0) + " sec");
         }
 
-        System.out.println("Ilosc odpadow = " + bestValue);
+        System.out.println("Powierzchnia odpadu : " + bestValue);
     }
 
     /**
