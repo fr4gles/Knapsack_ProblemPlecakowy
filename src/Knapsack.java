@@ -4,7 +4,7 @@ import java.util.List;
 /**
  * Knapsack -> obsluguje algorytm do ukladania klockow
  *
- * @author Michal
+ * @author Michal Franczyk 
  * @date 22.03.2013
  */
 public class Knapsack 
@@ -65,12 +65,12 @@ public class Knapsack
 
 /**
  * Klasa odpowiedzialna za drzewo ulozen prostokatow
- * @author Michal
+ * @author Michal Franczyk
  */
 class Node
 {
-    private Node left;      // lewy korzen
-    private Node right;     // prawy korzen
+    private Node left;      // lewy liść
+    private Node right;     // prawy liść
     private Rectangle rect; // prostokat
     private Boolean filled = Boolean.FALSE; // czy wypelniony?
     
@@ -78,9 +78,16 @@ class Node
      * Głowny funckja programu
      * rekurencyjnie układa prostokaty na planszy budujac drzewo ulozenia prostokatow
      * ogólna zasadza dzialania algorytmu, którego idea jest przedstawiona w http://www.blackpawn.com/texts/lightmaps/:
-     * 1. Jako pierwszy element wstawiasz duży prostokąt który będzie naszą planszą.
-     * 2. Następnie duży prostokąt jest dzielony na dwa mniejsze i tam przechowuje swoje liście (budowa drzewiasta)
-     * czyli prostokaty ktore sie zmiejscily
+     *  --
+     * 1. Jako pierwszy element wstawiany jest duży prostokąt który będzie plansza.
+     * 2. Przy pórbie położenia następnego prostokąta plansza jest dzielona na "strefy" - A i B, w którepowinny się zmiejscic kolejne kladzione klocki.
+     * ( wszystko przedstawione / reprezentowane w budowie drzewiastej )
+     * 3. Kiedy chcemy polozyc nastepny klocek sprawdzamy czy zmiesci sie w ponad strefą A
+     * 4. i jesli tak to sprawdzamy czy zmiesci sie na lewo strefy B
+     * 5. jeśli nie to sprawdzamy prawa strone B
+     * 6. jesli pasuje to dzieliny na nowe strefy A i B ta jak wczesniej
+     * 7. w przeciwnym razie kladziemy ponad stara strefą A, w tym przypadku dzieliny na D i C
+     *  --
      * @param rect
      * @return 
      */
@@ -90,50 +97,51 @@ class Node
         if(System.currentTimeMillis() > Main.getDEADLINE())
             return null;
         
-        if(this.left != null)
+        if(this.left != null)   // jeśli nie jesteśmy liśćiem 
         {
-            Node tmpNode = this.left.insert(rect);
+            Node tmpNode = this.left.insert(rect);  // spróbuj zrobić insert do pierwszego dziecka
             
-            if(tmpNode != null)
+            if(tmpNode != null)     // jeśli się nie powiodło
                 return tmpNode;
             
-            tmpNode = this.right.insert(rect);
+            tmpNode = this.right.insert(rect);  // jednak nie ma miejsca, insert do drugiego dziecka
             return tmpNode;
         }
         
-        if(this.filled)
+        if(this.filled)     // jesli strefa jest juz wypelionia --> jest juz tam klocek
             return null;
         
-        if(!rect.fitsIn(this.rect))
+        if(!rect.fitsIn(this.rect))     // jesli strefa za mala 
             return null;
         
-        if(rect.isSameSizeAs(this.rect))
+        if(rect.isSameSizeAs(this.rect))    // jesli jest tego samego rozmiaru to akceptuj   
         {
             this.filled = Boolean.TRUE;
             return this;
         }
         
+        // w przeciwnym razie musimy podzielic lisc na kolejne ...
         this.left = new Node();
         this.right = new Node();
         
+        // decydujemy w którą stronę bedziemy dzielic
         Integer widthDiff = this.rect.GetWidth() - rect.GetWidth();
         Integer heightDiff = this.rect.GetHeight() - rect.GetHeight();
         
-        Rectangle me = this.rect;
-        
         if(widthDiff > heightDiff)
         {
-            // split literally into left and right, putting the rect on the left.
-            this.left.setRect(new Rectangle(rect.GetWidth(), me.GetHeight(),me.GetX(), me.GetY()));
-            this.right.setRect(new Rectangle(me.GetWidth() - rect.GetWidth(), me.GetHeight(),me.GetX() + rect.GetWidth(), me.GetY()));
+            // dzieliny na strefy prawa /lewa --> kladziemy na lewo
+            this.left.setRect(new Rectangle(rect.GetWidth(), this.rect.GetHeight(),this.rect.GetX(), this.rect.GetY()));
+            this.right.setRect(new Rectangle(this.rect.GetWidth() - rect.GetWidth(), this.rect.GetHeight(),this.rect.GetX() + rect.GetWidth(), this.rect.GetY()));
         }
         else
         {
-            // split into top and bottom, putting rect on top.
-            this.left.setRect(new Rectangle(me.GetWidth(), rect.GetHeight(),me.GetX(), me.GetY()));
-            this.right.setRect(new Rectangle(me.GetWidth(), me.GetHeight() - rect.GetHeight(), me.GetX(), me.GetY() + rect.GetHeight()));
+            // dzieliny na strefy gora / dol -> kladziemy na gorze
+            this.left.setRect(new Rectangle(this.rect.GetWidth(), rect.GetHeight(),this.rect.GetX(), this.rect.GetY()));
+            this.right.setRect(new Rectangle(this.rect.GetWidth(), this.rect.GetHeight() - rect.GetHeight(), this.rect.GetX(), this.rect.GetY() + rect.GetHeight()));
         }
 
+        // poloz na pierwszym dziecku ktory stworzylismy
         return this.left.insert(rect);
     }
 
@@ -146,36 +154,69 @@ class Node
     }
 }
 
+/**
+ * Klasa reprezentujaca prostokat
+ * @author Michal Franczyk
+ */
 class Rectangle
 {
-    private Integer x_pos;
-    private Integer y_pos;
-    private Integer width;
-    private Integer height;
-    private Integer area;
+    private Integer x_pos;  // pozycja oX
+    private Integer y_pos;  // pozycja oY
+    private Integer width;  // szerokosc
+    private Integer height; // wysokosc
+    private Integer area;   // pole powierzchni
 
+    /**
+     * konstrkutor inicjalizujacy z pozycja 0,0
+     * @param w szerokosc
+     * @param h wysokosc
+     */
     public Rectangle(Integer w, Integer h)
     {
         Init(w, h, 0, 0);
     }
     
+    /**
+     * konstrkutor inicjalizujacy z pozycja x,y
+     * @param w szerokosc
+     * @param h wysokosc
+     * @param x pozycja na oX
+     * @param y pozycja na oY
+     */
     public Rectangle(Integer w, Integer h, Integer x, Integer y)
     {
         Init(w, h, x, y);
     }
     
+    /**
+     * funkcja sprawdzajaca czy przekazany prostokat miesci sie w obencym (strefy ...)
+     * @param rect przekazany prostokat
+     * @return prawda jesli tak, falsz jesli nie
+     */
     public Boolean fitsIn(Rectangle rect)
     {
         return ( rect.GetWidth() >= this.GetWidth() ) 
                 && (rect.GetHeight() >= this.GetHeight());
     }
     
+    /**
+     * funkcja sprawdzajaca czy przekazany prostokat jest taki sam jak obency (strefy ...)
+     * @param rect przekazany prostokat
+     * @return prawda jesli tak, falsz jesli nie
+     */
     public Boolean isSameSizeAs(Rectangle rect)
     {
         return (rect.GetWidth() == this.GetWidth())
                 && (rect.GetHeight() == this.GetHeight());
     }
     
+    /**
+     * funkcja inicjalizujaca zmienne i obliczajace pole prostokata
+     * @param w szer
+     * @param h wys
+     * @param x oX
+     * @param y oY
+     */
     private void Init(Integer w, Integer h, Integer x, Integer y)
     {
         width = w;
@@ -187,63 +228,117 @@ class Rectangle
         area = width * height;
     }
     
+    /**
+     * getter ... 
+     * @return pozycja na oX
+     */
     public Integer GetX()
     {
         return x_pos;
     }
     
+    /**
+     * getter ...
+     * @return pozycja na oY
+     */
     public Integer GetY()
     {
         return y_pos;
     }
     
+    /**
+     * getter ..
+     * @return szerokosc
+     */
     public Integer GetWidth()
     {
         return width;
     }
     
+    /**
+     * getter ...
+     * @return wysokosc
+     */
     public Integer GetHeight()
     {
         return height;
     }
     
+    /**
+     * getter ...
+     * @return pole powierzchni
+     */
     public Integer Area()
     {
         return area;
     }
 }
 
+/**
+ * Enum sluzacy do porzedstawienia wielkosci po jakiej bedziemy sortowac prostokaty
+ * wg algortmu, najefektywniejszym sposobem jest sortowanie po szerokosci (w sposob malejacy)
+ * @author Michal
+ */
 enum Order 
 {
-    Area, 
-    Width, 
-    Height
+    Area,   // pole pow
+    Width,  // szerokosc
+    Height  // wysokosc
 }
 
+/**
+ * Klasa odpowiedzialna za możliwosc sortowania listy wlasnych obiektow prostokatow
+ * klasa komparator
+ * klasa abstrakcyjna
+ * @author Michal
+ */
 abstract class RectComparator implements Comparator<Rectangle> 
 {
-    protected Order sortingBy = Order.Area;
+    protected Order sortingBy = Order.Width;    // domyslny tryb sortowania
 
+    /**
+     * konstruktor
+     */
     public RectComparator()
     {
-        this.sortingBy = Order.Area;
+        this.sortingBy = Order.Width;
     }
 
     @Override
     abstract public int compare(Rectangle rect1, Rectangle rect2);
 }
 
+/**
+ * klasa dziedziczy po RectComparator
+ * odpowiada za sortowanie prostokatow w sposob rosnacy
+ * @author Michal
+ */
 class AscRectComparator extends RectComparator
 {
+    /**
+     * konstruktor
+     */
     public AscRectComparator()
     {
         super();
     }
     
+    /**
+     * konstruktor z wlasna inicjalizacja
+     * @param sortBy 
+     */
     public AscRectComparator(Order sortBy)
     {
         this.sortingBy = sortBy;
     }
+    
+    /**
+     * funckja odpowiadajaca za porownania
+     * pozwala na sortowanie
+     * @param rect1 pierwszy 
+     * @param rect2 drugi do porownania
+     * @return zgodnie z dokumentacja javy, to samo co zwraca compareTo
+     */
     public int compare(Rectangle rect1, Rectangle rect2) 
     {
         switch(sortingBy)
@@ -256,18 +351,37 @@ class AscRectComparator extends RectComparator
     }
 }
 
+/**
+ * klasa dziedziczy po RectComparator
+ * odpowiada za sortowanie prostokatow w sposob malejacy
+ * @author Michal
+ */
 class DescRectComparator extends RectComparator
 {
+    /**
+     * konstruktor
+     */
     public DescRectComparator()
     {
         super();
     }
     
+    /**
+     * konstruktor z wlasna inicjalizacja
+     * @param sortBy 
+     */
     public DescRectComparator(Order sortBy)
     {
         this.sortingBy = sortBy;
     }
 
+    /**
+     * funckja odpowiadajaca za porownania
+     * pozwala na sortowanie
+     * @param rect1 pierwszy 
+     * @param rect2 drugi do porownania
+     * @return zgodnie z dokumentacja javy, to samo co zwraca compareTo
+     */
     public int compare(Rectangle rect1, Rectangle rect2) 
     {
         switch(sortingBy)

@@ -10,7 +10,7 @@ import java.util.Scanner;
  * Main -> obsluguje wczytywanie pliku oraz wielosci tafli
  * zarzadza probami ulozenia klockow
  *
- * @author Michal
+ * @author Michal Franczyk
  * @date 22.03.2013
  */
 public class Main
@@ -91,7 +91,7 @@ public class Main
 
         // zmienna odpowiedzialna za zmiane wielkosci po jakiej prostokaty beda sortowane
         // wiecej w wybierzTrybSortowania
-        // 0 pole, 1 wysokosc, 2 szerokosc
+        // 0 szerokosc, 1 wysokosc, 2 pole
         int localSortType = 0;
         
         // zmienna potrzebna do zerowania trybow sortowania
@@ -159,11 +159,11 @@ public class Main
         List<Rectangle> rectListLocalCopy = new ArrayList<>(rectListOrigin);
         switch (i)
         {
-            case 0:     // sortuj rosnaco
-                Collections.sort(rectListLocalCopy, new AscRectComparator(ord));
+            case 0:     // sortuj malejaco --> z tym algorytm pracuje najefektynej
+                        Collections.sort(rectListLocalCopy, new DescRectComparator(ord));
                 break;
-            case 1:     // sortuj malejaco
-                Collections.sort(rectListLocalCopy, new DescRectComparator(ord));
+            case 1:     // sortuj rosnaco
+                Collections.sort(rectListLocalCopy, new AscRectComparator(ord));
                 break;
             case 2:     // sortuj "polowicznie" ... wiecej info w rectListSorter
                 rectListLocalCopy = rectListSorter(rectListLocalCopy, 0, ord);
@@ -212,11 +212,11 @@ public class Main
         switch (tryb)
         {
             case 0:
-                return Order.Area;
+                return Order.Width;
             case 1:
                 return Order.Height;
             case 2:
-                return Order.Width;
+                return Order.Area;
         }
         throw new RuntimeException("Natrafilem na zly case | wybierzTrybSortowania");
     }
