@@ -26,6 +26,7 @@ public class Knapsack
     /**
      * funkcja pack
      * zarzadza ukladaniem klockow na planszy
+     * opis samego ukladania w Node.insert
      * @return ilosc odpadow
      */
     public int pack() 
@@ -42,6 +43,7 @@ public class Knapsack
             }
         }
         
+        // po skonczeniu ukladania, aktualizuj wielkosc odpadu
         iloscOdpadow = Main.getTOTAL_SURFACE_SIZE() - Main.getFILLED_AREA();
         
         if(Main.getTEST())
@@ -50,6 +52,9 @@ public class Knapsack
         return iloscOdpadow;
     }
     
+    /**
+     * inicjalizacja lub reset wartosci poczatkowych
+     */
     public void InitOrResetRootNode()
     {
         iloscOdpadow = 0;
@@ -58,16 +63,30 @@ public class Knapsack
     }
 }
 
-
+/**
+ * Klasa odpowiedzialna za drzewo ulozen prostokatow
+ * @author Michal
+ */
 class Node
 {
-    private Node left;
-    private Node right;
-    private Rectangle rect;
-    private Boolean filled = Boolean.FALSE;
+    private Node left;      // lewy korzen
+    private Node right;     // prawy korzen
+    private Rectangle rect; // prostokat
+    private Boolean filled = Boolean.FALSE; // czy wypelniony?
     
+    /**
+     * Głowny funckja programu
+     * rekurencyjnie układa prostokaty na planszy budujac drzewo ulozenia prostokatow
+     * ogólna zasadza dzialania algorytmu, którego idea jest przedstawiona w http://www.blackpawn.com/texts/lightmaps/:
+     * 1. Jako pierwszy element wstawiasz duży prostokąt który będzie naszą planszą.
+     * 2. Następnie duży prostokąt jest dzielony na dwa mniejsze i tam przechowuje swoje liście (budowa drzewiasta)
+     * czyli prostokaty ktore sie zmiejscily
+     * @param rect
+     * @return 
+     */
     public Node insert(Rectangle rect)
     {
+        // gdyby działanie programu znacznie przekroczyło dozwolony czas ...
         if(System.currentTimeMillis() > Main.getDEADLINE())
             return null;
         
