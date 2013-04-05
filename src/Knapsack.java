@@ -277,7 +277,7 @@ class Rectangle
 /**
  * Enum sluzacy do porzedstawienia wielkosci po jakiej bedziemy sortowac prostokaty
  * wg algortmu, najefektywniejszym sposobem jest sortowanie po szerokosci (w sposob malejacy)
- * @author Michal
+ * @author Michal Franczyk 
  */
 enum Order 
 {
@@ -290,7 +290,7 @@ enum Order
  * Klasa odpowiedzialna za możliwosc sortowania listy wlasnych obiektow prostokatow
  * klasa komparator
  * klasa abstrakcyjna
- * @author Michal
+ * @author Michal Franczyk 
  */
 abstract class RectComparator implements Comparator<Rectangle> 
 {
@@ -311,7 +311,7 @@ abstract class RectComparator implements Comparator<Rectangle>
 /**
  * klasa dziedziczy po RectComparator
  * odpowiada za sortowanie prostokatow w sposob rosnacy
- * @author Michal
+ * @author Michal Franczyk 
  */
 class AscRectComparator extends RectComparator
 {
@@ -354,7 +354,7 @@ class AscRectComparator extends RectComparator
 /**
  * klasa dziedziczy po RectComparator
  * odpowiada za sortowanie prostokatow w sposob malejacy
- * @author Michal
+ * @author Michal Franczyk 
  */
 class DescRectComparator extends RectComparator
 {

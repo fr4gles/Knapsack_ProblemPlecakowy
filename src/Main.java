@@ -83,7 +83,7 @@ public class Main
 
         // czas po jakim spodziewamy sie skonczenia programu
         // jesli program przekroczy czas endTime to przy następnej iteracji przerwie działanie
-        long endTime = System.currentTimeMillis() + 30000; // (3*60000), 3min
+        long endTime = System.currentTimeMillis() + 200000; // (3*60000), 3min
 
         // zmienna odpowidajaca za zmiane strategi kolejnosci ulozenia klockow w liscie
         // wiecej w switchShuffleCollections
